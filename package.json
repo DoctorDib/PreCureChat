@@ -1,0 +1,14 @@
+{
+  "name": "PreCure Chat",
+  "version": "1.0",
+  "description": "PreCure Chat app - Socket.io",
+  "dependencies": {
+    "express": "^4.15.2",
+    "mongodb": "^2.2.31",
+    "mongoose": "^4.11.12",
+    "socket.io": "^1.7.3"
+  },
+  "scripts": {
+    "start": "nodemon server.js"
+  }
+}

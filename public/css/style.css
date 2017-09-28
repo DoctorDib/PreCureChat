@@ -1,0 +1,211 @@
+* { 
+    margin: 0; padding: 0; box-sizing: border-box; 
+}
+body { 
+    font:    13px Helvetica, Arial; 
+}
+form { 
+    position: fixed; 
+    bottom: 0; 
+    width: 100%;
+    height: 3%; 
+    border: 0;
+}
+form input { 
+    width: 75%; 
+    height: 100%; 
+    font-size: 2em;
+    border: 0;
+    padding: 0.5em;
+    background-color: #dbdbdb;
+    
+}
+form button {
+    width: 10%;
+    background: #cbcbcb; 
+    position: absolute;
+    font-size: 2em;
+    height: 100%;
+    border: 0;
+}
+
+
+section {
+    position: absolute; 
+}
+#left form{
+    width: 15%;
+}
+#left {
+    height: 100%;
+    width: 15%;
+    left: 0;
+    background-color: #bb8654;
+    overflow-y: auto;
+    -webkit-box-shadow: -5px 0px 8px 8px rgba(0,0,0,1);
+    -moz-box-shadow: -5px 0px 8px 8px rgba(0,0,0,1);
+    box-shadow: -5px 0px 10px 6px rgba(0,0,0,1);
+    z-index: 1;
+}
+#right{
+    height: 97%;
+    width: 85%;
+    right:0;
+    background-color: #E3CDA4;
+    overflow-y: auto;
+}
+
+#messages li {
+
+    box-shadow: 0px 4px 1px rgba(0, 0, 0, 0.1);
+    
+    margin: 0.5em;
+
+    height: 100%;
+
+    padding: 1em;
+    word-wrap: break-word;
+
+    font-size: 1.5em;
+
+    border-radius: 1em;
+
+    clear: both;
+
+    vertical-align: middle;
+
+    list-style-type: none;
+
+}
+
+#sender{
+    background-color: #703030;
+    color: #dcdcdc;
+    float: right;
+    clear: both;
+    
+    max-width: 50%;
+    min-width: 5em;
+}
+#reciever{
+    text-align:left;
+    background-color: #C77966;
+    color: #fff;
+    float: left;
+    clear: both;
+
+    max-width: 50%;
+    min-width: 5em;
+}
+#senderImg{
+    background-color: gray;
+    color: black;
+    float: right;
+    clear: both;
+    max-width: 100%;
+    min-width: 5em;
+
+}
+#recieverImg{
+    text-align:left;
+    background-color: white;
+    color: #777;
+    float: left;
+    clear: both;
+
+    max-width: 100%;
+    min-width: 5em;
+}
+
+
+#launcher {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: #2F343B;
+    z-index: 2;
+    display: 'block';
+}
+
+#launcherInput{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+   
+    width: 50%;
+    height: 4%;
+    font-size: 3.5em;
+    text-align: center;
+    border: 0;
+
+}
+#launcherButton{
+    position: fixed;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+   
+    width: 25%;
+    height: 4%;
+    font-size: 3.5em;
+    text-align: center;
+    background-color: #7f7b7b;
+    border: 0;
+}
+#launcherTitle{
+    position:fixed;
+    left:50%;
+    transform: translate(-50%);
+    font-size: 10em;
+    color: white;
+}
+
+#numofPeople{
+    padding: 0.75em;
+    font-size: 2em;
+    z-index: 3;
+    color: white;
+    top: 0;
+}
+.Remove{
+    font-size: 2em;
+    padding: 0.75em;
+    width: 100%;
+    min-height: 3em;
+    word-wrap: break-word;
+}
+
+.typing{
+    bottom: 0;
+    position: absolute;
+    font-size: 1.5em;
+    padding: 0.5em;
+}
+
+img{
+    max-width: 100%;
+}
+
+
+@media only screen and (max-width: 1000px) {
+    
+    #right{
+        width: 100%;
+    }
+    #left{
+        width: 0;
+    }
+    #left form{
+        display: none;
+    }
+    #right form{
+        height: 6%;
+    }
+
+    li{
+        font-size: 1.7em;
+    }
+
+}
+
