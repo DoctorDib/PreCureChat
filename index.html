@@ -4,6 +4,7 @@
 
     <title>Precure chat</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="https://code.jquery.com/jquery.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -30,16 +31,16 @@
 
     <section id='right'>
         
-  
-        <ul id="messages"></ul>
-
-        <p class="typing"> </p>
+        <ul id="messages" class="custom-scroll"></ul>
 
         <form action="">
+            <p class="typing"> </p>
             <input id="m" autocomplete="off" autofocus/> <button>Send</button>
         </form>
 
     </section>
+
+    
 
   </body>
 </html>

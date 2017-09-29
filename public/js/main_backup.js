@@ -5,7 +5,6 @@ var USERNAME = '';
 var className = '';
 var user = '';
 
-var message = {};
 
 // lastCacheMsh - Always holds the latest up-to-date message. 
 var lastCacheMsg = '';
@@ -60,7 +59,6 @@ jQuery(function () {
     var socket = io();
     // A unique value that no user will accidentally type. (1/1000000000000 chance(Probably more))
     var SPACE = "=!837569375asdf43qw4fr5ge5t6se45rtg4g5e4g6: ";
-    var usersTyping = [];
 
     // Sends current value in input box to the server.
     jQuery('form').submit(function(){
@@ -68,16 +66,11 @@ jQuery(function () {
         // USERNAME - The users name tag.
         // className - the slugified name of USERNAME to help identify when editting personal message.
         // jQuery('#m').val() - The message.
-
-        message = {edit: reType, user: USERNAME, classN: className, msg: jQuery('#m').val()};
-        console.log(message);
-        
-        socket.emit('chat message', message);
-        timeoutFunction();
+        socket.emit('chat message', reType + SPACE + USERNAME  + SPACE + className + SPACE + jQuery('#m').val());
 
         lastCacheMsg = jQuery('#m').val();
 
-        $('#messages').scrollTop($('#messages')[0].scrollHeight);
+        $('#right').scrollTop($('#right')[0].scrollHeight);
 
         jQuery('#m').val('');
         return false;
@@ -87,13 +80,12 @@ jQuery(function () {
     // Recieving message from server.
     socket.on('chat message', function(msg){
         // Collects data by splitting at space.
-        console.log(msg);
+        var message = msg.split(SPACE);
 
-        var boolRetype = msg.edit;
-        var userName = msg.user;
-        var className = msg.classN;
-        var message = msg.msg;
-        console.log(message);
+        var boolRetype = message[0];
+        var userName = message[1]
+        var className = message[2]
+        message = message[3]
 
         // When recieveing message, it will check whether current chatroom is active.
         if(activeSession === false){
@@ -110,15 +102,15 @@ jQuery(function () {
             if(user === userName){
                 jQuery('#messages').append(jQuery('<li id="senderImg">').append(jQuery('<img src="' + message + '" alt="sent by ' + userName + '" />')))
             } else {
-                jQuery('#messages').append(jQuery('<li id="recieverImg">').append(jQuery('<p>').html(userName.bold())).append(jQuery('<img src="' + message + '" alt="sent by ' + userName + '" />')));
+                jQuery('#messages').append(jQuery('<li id="recieverImg">').append(jQuery('<p>').html(userName.bold() + ':')).append(jQuery('<img src="' + message + '" alt="sent by ' + userName + '" />')));
             }
         } else {
             // Retyping the message either from sender or reciever.
-            if (boolRetype === true) {
+            if (boolRetype === 'true') {
                 if (user === userName) {
                     jQuery('#messages li#sender:last')[0].innerHTML = message;
                 } else {
-                    jQuery('#messages li#reciever.' + className + ':last div#messageTag')[0].innerHTML = message;
+                    jQuery('#messages li#reciever.' + className + ':last')[0].innerHTML = userName.bold() + ": " + message;
                 }
                 reType = false;
             } else {
@@ -126,14 +118,8 @@ jQuery(function () {
                 if (user === userName) {
                     jQuery('#messages').append($('<li id="sender" class="' + className + '">').text(message));
                 } else {
-                    var userTag = document.createElement('div');
-                    userTag.id = 'nameTag';
-                    userTag.innerHTML = userName.bold();
-                    var msgTag = document.createElement('div');
-                    msgTag.id = 'messageTag';
-                    msgTag.innerHTML = message;
-                    jQuery('#messages').append($('<li id="reciever" class="' + className + '">').append(userTag).append(msgTag));}
-                    //jQuery('#messages').append($('<li id="reciever" class="' + className + '">').append($('<div id="nameTag">').html(userName.bold()) + $('<div id="messageTag">').html(message)));}
+                    jQuery('#messages').append($('<li id="reciever" class="' + className + '">').html(userName.bold() + ": " + message));
+                }
             }
         }
 
@@ -163,44 +149,25 @@ jQuery(function () {
     // typing will change depending on whether you're typing.
     function timeoutFunction() {
         typing = false;
-        var typingObj = {
-            typing: false,
-            userName: USERNAME
-        };
-        socket.emit("typing", typingObj);
+        socket.emit("typing", false);
     }
 
     // [USERNAME] is typing... 
     // Sets value to check if you're typing.
     jQuery('#m').keyup(function() {
         typing = true;
-        var typingObj = {
-            typing: true,
-            userName: USERNAME
-        };
-        socket.emit('typing', typingObj);
+        socket.emit('typing', USERNAME + ' is typing...');
         clearTimeout(timeout);
         timeout = setTimeout(timeoutFunction, 2000);
     });
 
+
     // Will input the data into a <P> tag.    
     socket.on('typing', function(data) {
-            if (data.typing && data.userName !== USERNAME) {
-            if($.inArray(data.userName, usersTyping) === -1) {
-                usersTyping.push(data.userName);
-            }
-                if(usersTyping.length > 1) {
-                    jQuery('.typing').html(usersTyping.join(", ") + ' is typing...');
-                } else {
-                    jQuery('.typing').html(usersTyping[0] + ' is typing...');
-                }
-
+        if (data && data.split(' ')[0] !== USERNAME) {
+            jQuery('.typing').html(data);
         } else {
-            if(data.userName !== USERNAME) {
-                var index = usersTyping.indexOf(data.userName);
-                usersTyping.splice(index, 1);
-                jQuery('.typing').html("");
-            }
+            jQuery('.typing').html("");
         }
     });
 
