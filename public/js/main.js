@@ -22,7 +22,9 @@ var activeSession = true;
 // counts how many missed messages and places value into tab title.
 var inactiveMessageCount = 0;
 // Changable notification sound.
-var audio = new Audio('./sound/notification.mp3');
+var notifSound = new Audio('./sound/NewMessage.mp3');
+var loggedIn = false;
+
 
 
 // .blur and .focus will detect if your current active window is the chatroom.
@@ -47,12 +49,18 @@ var submit = function() {
     socket.emit('username', USERNAME);
     user = USERNAME;
     if(USERNAME.replace(/\s/g, '') !== ''){
-        var disp = jQuery('#launcher')[0]
-        disp.style.display = "none"
+        var disp = jQuery('#launcher')[0];
+        disp.style.display = "none";
+        console.log('Logged in!');
+        setTimeout(function(){
+            loggedIn = true;
+            socket.emit('login', USERNAME);
+            }, 100);
+        //loggedIn = true;
     } else {
         alert('Please enter your username!');
     }
-}
+};
 
 
 
@@ -63,26 +71,48 @@ jQuery(function () {
     var usersTyping = [];
 
     // Sends current value in input box to the server.
-    jQuery('form').submit(function(){
+    jQuery('#messageInput').submit(function(){
         //reType - Whether they are editing their previous message.
         // USERNAME - The users name tag.
         // className - the slugified name of USERNAME to help identify when editting personal message.
         // jQuery('#m').val() - The message.
 
-        message = {edit: reType, user: USERNAME, classN: className, msg: jQuery('#m').val()};
-        console.log(message);
-        
-        socket.emit('chat message', message);
-        timeoutFunction();
+        console.log('Submitting!');
+        console.log(this);
+            message = {edit: reType, user: USERNAME, classN: className, msg: jQuery('#m').val()};
+            console.log(message);
 
-        lastCacheMsg = jQuery('#m').val();
+        if(loggedIn) {
+            socket.emit('chat message', message);
+            timeoutFunction();
+        }
 
-        $('#messages').scrollTop($('#messages')[0].scrollHeight);
+            lastCacheMsg = jQuery('#m').val();
 
-        jQuery('#m').val('');
-        return false;
+            $('#messages').scrollTop($('#messages')[0].scrollHeight);
+
+            jQuery('#m').val('');
+            return false;
     });
 
+    socket.on('login', function(user){
+        if(user !== USERNAME){
+            var msgTag = document.createElement('div');
+            msgTag.id = 'messageTag';
+            msgTag.innerHTML = user + ' has logged in!';
+            jQuery('#messages').append($('<li id="reciever" class="' + className + '">').append(msgTag));
+        }
+    });
+
+    socket.on('disconnect', function(user){
+        console.log(user);
+        if(user !== USERNAME){
+            var msgTag = document.createElement('div');
+            msgTag.id = 'messageTag';
+            msgTag.innerHTML = user + ' has disconnected!';
+            jQuery('#messages').append($('<li id="reciever" class="' + className + '">').append(msgTag));
+        }
+    });
 
     // Recieving message from server.
     socket.on('chat message', function(msg){
@@ -93,13 +123,20 @@ jQuery(function () {
         var userName = msg.user;
         var className = msg.classN;
         var message = msg.msg;
-        console.log(message);
 
         // When recieveing message, it will check whether current chatroom is active.
-        if(activeSession === false){
+        if(activeSession === false && !boolRetype){
             inactiveMessageCount += 1;
             document.title = inactiveMessageCount;
-            audio.play();
+
+            notifSound.play();
+            Push.create("You have new messages!",{
+                body: userName + ": " + message,
+                timeout: 5000,
+                icon: '../img/NotificationIcon.jpg',
+                onClick: function(){window.focus();Push.clear()},
+                vibrate: [200, 100, 200, 100, 200, 100, 200]
+            });
         }
 
         // splits to check if the last value is one of the below image/gif formats.
@@ -112,7 +149,32 @@ jQuery(function () {
             } else {
                 jQuery('#messages').append(jQuery('<li id="recieverImg">').append(jQuery('<p>').html(userName.bold())).append(jQuery('<img src="' + message + '" alt="sent by ' + userName + '" />')));
             }
-        } else {
+		} else if(jQuery.inArray(img, ['mp4', 'wmv', 'mov', 'flv']) !== -1){
+			console.log(img);
+			if(user === userName){
+                jQuery('#messages').append(jQuery('<li id="senderVideo">').append(jQuery('<video src="' + message + '" class="video" alt="sent by ' + userName + '" />')))
+            } else {
+                jQuery('#messages').append(jQuery('<li id="recieverVideo">').append(jQuery('<p>').html(userName.bold())).append(jQuery('<video src="' + message + '" class="video" alt="sent by ' + userName + '" />')));
+            }
+			
+			
+			$('.video').mouseover(function(){
+				jQuery(this).get(0).play();
+			}).mouseout(function(){
+				jQuery(this).get(0).pause();
+			})
+		
+        } else if(message.includes('https://www.youtube.com/watch?') || message.includes('https://youtu.be/')){
+			console.log(img);
+			var splitter = message.includes('https://www.youtube.com/watch?') ? message.split('=')[1] : message.split('/').pop();
+			console.log(message)
+			message = 'https://www.youtube.com/embed/' + splitter.split('&')[0];
+			if(user === userName){
+                jQuery('#messages').append(jQuery('<li id="senderYT">').append(jQuery('<iFrame src="' + message + '" class="video" alt="sent by ' + userName + '" />')))
+            } else {
+                jQuery('#messages').append(jQuery('<li id="recieverYT">').append(jQuery('<p>').html(userName.bold())).append(jQuery('<iFrame src="' + message + '" class="video" alt="sent by ' + userName + '" />')));
+            }
+		}else {
             // Retyping the message either from sender or reciever.
             if (boolRetype === true) {
                 if (user === userName) {
@@ -142,17 +204,18 @@ jQuery(function () {
     });
 
     // This function is list every active user in session to the left hand side.
-    socket.on('people', function(msg){
+    socket.on('people', function(onlineList){
 
-        var numberOfPeople = msg.split(' == = == ')[1];
-        var listOfPeople = msg.split(' == = == ')[0];
+        console.log(onlineList);
+        var numberOfPeople = onlineList.length;//msg.split(' == = == ')[1];
+        var listOfPeople = onlineList;//msg.split(' == = == ')[0];
 
-        listOfPeople = listOfPeople.split(',')
+        //listOfPeople = listOfPeople.split(',');
 
         jQuery('.Remove').remove();
 
         for(np = 0; np<listOfPeople.length; np++){
-            jQuery('#listedPeople').append($('<li class="Remove">').text(listOfPeople[np]));
+            jQuery('#listedPeople').append($('<li class="Remove">').text(listOfPeople[np].name));
         }
 
         jQuery('#numofPeople')[0].innerHTML = 'Current Online: ' + numberOfPeople;
@@ -204,6 +267,11 @@ jQuery(function () {
         }
     });
 
+    socket.on('debug', function(data){
+        console.log('--- DEBUG DATA ---');
+        console.log(data);
+        console.log('--- END DEBUG DATA ---');
+    });
 
 });
 

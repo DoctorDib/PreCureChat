@@ -6,11 +6,16 @@
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="https://code.jquery.com/jquery.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+   
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!--<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+      <script src="js/push.js"></script>
+    
     <script type="text/javascript" src="/js/main.js"></script>
-    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-  	
+
+
   </head>
   <body>
 
@@ -33,7 +38,7 @@
         
         <ul id="messages" class="custom-scroll"></ul>
 
-        <form action="">
+        <form action="" id="messageInput">
             <p class="typing"> </p>
             <input id="m" autocomplete="off" autofocus/> <button>Send</button>
         </form>
