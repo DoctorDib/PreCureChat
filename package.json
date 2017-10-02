@@ -4,6 +4,7 @@
   "description": "PreCure Chat app - Socket.io",
   "dependencies": {
     "express": "^4.15.2",
+    "js-sha256": "^0.6.0",
     "mongodb": "^2.2.31",
     "mongoose": "^4.11.12",
     "push.js": "^1.0.4",

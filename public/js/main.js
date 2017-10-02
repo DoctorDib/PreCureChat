@@ -24,8 +24,35 @@ var inactiveMessageCount = 0;
 // Changable notification sound.
 var notifSound = new Audio('./sound/NewMessage.mp3');
 var loggedIn = false;
+var loginSocket = io('/login');
+
+var checkCookie = function (token){
+
+    try {
+        var cookies = token.split('---');
+
+        var cookies_obj = {
+            token: cookies[0].split('=')[1],
+            expiry: cookies[1].split('=')[1]
+        };
 
 
+        return cookies_obj;
+    } catch(err){
+        return false;
+    }
+};
+
+// MAKE IT DETECT IF COOKIE
+var token = checkCookie(document.cookie);
+
+function tokenCheck(){
+    if(token !== false){
+        loginSocket.emit('tokenLogin', token);
+    }
+}
+
+tokenCheck();
 
 // .blur and .focus will detect if your current active window is the chatroom.
 // Clicked off screen.
@@ -40,22 +67,31 @@ jQuery(window).focus(function(){
 });
 
 
+
+
 // FIRST TIME LAUNCHER  - submit() will run once the launcher button has been clicked.
-var submit = function() {
+var submit = function(uData) {
     var socket = io();
-    USERNAME = document.getElementById('launcherInput').value;
+    USERNAME = uData.uName;//document.getElementById('launcherInput').value;
+    token = {
+        token: uData.token,
+        expiry: uData.tokenExpire
+    };
+    document.cookie = 'token=' + token.token + '--- expires=' + token.expiry + ';';
     // className slugifies USERNAME
-    className = USERNAME.replace(/\s/g, '_');
+    className = uData.uID;//.replace(/\s/g, '_');
     socket.emit('username', USERNAME);
     user = USERNAME;
-    if(USERNAME.replace(/\s/g, '') !== ''){
+    if(USERNAME !== ''){
         var disp = jQuery('#launcher')[0];
         disp.style.display = "none";
-        console.log('Logged in!');
         setTimeout(function(){
             loggedIn = true;
             socket.emit('login', USERNAME);
+
+
             }, 100);
+        loggedInTime();
         //loggedIn = true;
     } else {
         alert('Please enter your username!');
@@ -64,10 +100,10 @@ var submit = function() {
 
 
 
-jQuery(function () {
+//jQuery(function () {
+var loggedInTime = function(){
     var socket = io();
     // A unique value that no user will accidentally type. (1/1000000000000 chance(Probably more))
-    var SPACE = "=!837569375asdf43qw4fr5ge5t6se45rtg4g5e4g6: ";
     var usersTyping = [];
 
     // Sends current value in input box to the server.
@@ -76,11 +112,7 @@ jQuery(function () {
         // USERNAME - The users name tag.
         // className - the slugified name of USERNAME to help identify when editting personal message.
         // jQuery('#m').val() - The message.
-
-        console.log('Submitting!');
-        console.log(this);
             message = {edit: reType, user: USERNAME, classN: className, msg: jQuery('#m').val()};
-            console.log(message);
 
         if(loggedIn) {
             socket.emit('chat message', message);
@@ -100,24 +132,27 @@ jQuery(function () {
             var msgTag = document.createElement('div');
             msgTag.id = 'messageTag';
             msgTag.innerHTML = user + ' has logged in!';
-            jQuery('#messages').append($('<li id="reciever" class="' + className + '">').append(msgTag));
+            jQuery('#messages').append($('<li id="connectionMsg" style="margin: 0.5em auto;" class="' + className + '">').append(msgTag));
+            $('#messages').scrollTop($('#messages')[0].scrollHeight);
         }
     });
 
     socket.on('disconnect', function(user){
-        console.log(user);
+        if(user === "transport close"){
+            location.reload();
+        }
         if(user !== USERNAME){
             var msgTag = document.createElement('div');
             msgTag.id = 'messageTag';
             msgTag.innerHTML = user + ' has disconnected!';
-            jQuery('#messages').append($('<li id="reciever" class="' + className + '">').append(msgTag));
+            jQuery('#messages').append($('<li id="connectionMsg" style="margin: 0.5em auto;" class="' + className + '">').append(msgTag));
+            $('#messages').scrollTop($('#messages')[0].scrollHeight);
         }
     });
 
     // Recieving message from server.
     socket.on('chat message', function(msg){
         // Collects data by splitting at space.
-        console.log(msg);
 
         var boolRetype = msg.edit;
         var userName = msg.user;
@@ -143,14 +178,12 @@ jQuery(function () {
         var img = message.split('.').pop();
         // First checks whether it's an image or not.
         if(jQuery.inArray(img, ["gif", "jpg", "jpeg", "png"]) !== -1){
-            console.log(img);
             if(user === userName){
                 jQuery('#messages').append(jQuery('<li id="senderImg">').append(jQuery('<img src="' + message + '" alt="sent by ' + userName + '" />')))
             } else {
                 jQuery('#messages').append(jQuery('<li id="recieverImg">').append(jQuery('<p>').html(userName.bold())).append(jQuery('<img src="' + message + '" alt="sent by ' + userName + '" />')));
             }
 		} else if(jQuery.inArray(img, ['mp4', 'wmv', 'mov', 'flv']) !== -1){
-			console.log(img);
 			if(user === userName){
                 jQuery('#messages').append(jQuery('<li id="senderVideo">').append(jQuery('<video src="' + message + '" class="video" alt="sent by ' + userName + '" />')))
             } else {
@@ -165,9 +198,7 @@ jQuery(function () {
 			})
 		
         } else if(message.includes('https://www.youtube.com/watch?') || message.includes('https://youtu.be/')){
-			console.log(img);
 			var splitter = message.includes('https://www.youtube.com/watch?') ? message.split('=')[1] : message.split('/').pop();
-			console.log(message)
 			message = 'https://www.youtube.com/embed/' + splitter.split('&')[0];
 			if(user === userName){
                 jQuery('#messages').append(jQuery('<li id="senderYT">').append(jQuery('<iFrame src="' + message + '" class="video" alt="sent by ' + userName + '" />')))
@@ -193,7 +224,7 @@ jQuery(function () {
                     userTag.innerHTML = userName.bold();
                     var msgTag = document.createElement('div');
                     msgTag.id = 'messageTag';
-                    msgTag.innerHTML = message;
+                    msgTag.innerHTML = message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     jQuery('#messages').append($('<li id="reciever" class="' + className + '">').append(userTag).append(msgTag));}
                     //jQuery('#messages').append($('<li id="reciever" class="' + className + '">').append($('<div id="nameTag">').html(userName.bold()) + $('<div id="messageTag">').html(message)));}
             }
@@ -206,7 +237,6 @@ jQuery(function () {
     // This function is list every active user in session to the left hand side.
     socket.on('people', function(onlineList){
 
-        console.log(onlineList);
         var numberOfPeople = onlineList.length;//msg.split(' == = == ')[1];
         var listOfPeople = onlineList;//msg.split(' == = == ')[0];
 
@@ -220,7 +250,6 @@ jQuery(function () {
 
         jQuery('#numofPeople')[0].innerHTML = 'Current Online: ' + numberOfPeople;
 
-        console.log(jQuery('#numofPeople')[0].innerHTML)
     });
 
     // typing will change depending on whether you're typing.
@@ -273,7 +302,7 @@ jQuery(function () {
         console.log('--- END DEBUG DATA ---');
     });
 
-});
+};
 
 
 
@@ -318,6 +347,78 @@ window.setTimeout(function(){
     jQuery('#launcherInput').focus();
 }, 250);
 
+function toggleRegister(){
+    $('#register').toggleClass('register-open');
+}
+function toggleForgotPass(){
+    $('#forgotPass').toggleClass('forgotPass-open');
+}
 
+function signupAcc(){
+    $('#regEmail')[0].style.border = 'none';
+    $('#regUName')[0].style.border = 'none';
+    $('#regDName')[0].style.border = 'none';
+    $('#regPWord')[0].style.border = 'none';
+    $('#regPWordC')[0].style.border = 'none';
+    var valid = true;
+    if(document.getElementById('regUName').value.length < 3){
+        console.error('BAD USERNAME');
+        valid = false;
+        $('#regUName')[0].style.border = '3px #f00 solid';
+        $('#regError')[0].innerHTML = 'Username must be at least 3 characters'
+    }
 
+    if(!$('#regDName').val().length > 0){
+        console.error('BAD DISPLAYNAME');
+        valid = false;
+        $('#regDName')[0].style.border = '3px #f00 solid';
+        $('#regError')[0].innerHTML = 'Enter a display name!'
+    }
 
+    if(!/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test($('#regEmail').val())){
+        valid = false;
+        $('#regEmail')[0].style.border = '3px #f00 solid';
+        $('#regError')[0].innerHTML = 'Enter a valid email'
+    }
+
+    if(document.getElementById('regPWord').value.length < 8){
+        console.error('BAD PASSWORD');
+        valid = false;
+        $('#regPWord')[0].style.border = '3px #f00 solid';
+        $('#regError')[0].innerHTML = 'Password must have 8 characters or more'
+    }
+
+    if($('#regPWord').val() !== $('#regPWordC').val()){
+        console.error('BAD PASSWORD CONFIRM');
+        valid = false;
+        $('#regPWord')[0].style.border = '3px #f00 solid';
+        $('#regPWordC')[0].style.border = '3px #f00 solid';
+        $('#regError')[0].innerHTML = 'Passwords do not match'
+    }
+
+    if(valid) {
+        var uDetails = {
+            userN: $('#regUName').val(),
+            userD: $('#regDName').val(),
+            userE: $('#regEmail').val(),
+            userP: $('#regPWord').val()
+        };
+        //loginSocket.emit('registerAccount', uDetails);
+    }
+}
+
+function loginUser(){
+    var uDetails = {
+        userN: $('#loginUName').val(),
+        userP: $('#loginPWord').val()
+    };
+    loginSocket.emit('login', uDetails);
+}
+
+loginSocket.on('doLogin', function(dName){
+    submit(dName);
+});
+
+function forgotPassword(email){
+    // The forgot password goes here, okay?
+}

@@ -48,13 +48,14 @@ section {
     height: 100%;
     width: 15%;
     left: 0;
-    background-color: #333;
     color: #fff;
     overflow-y: auto;
     -webkit-box-shadow: -5px 0px 8px 8px rgba(0,0,0,1);
     -moz-box-shadow: -5px 0px 8px 8px rgba(0,0,0,1);
     box-shadow: -5px 0px 10px 6px rgba(0,0,0,1);
     z-index: 1;
+    background: #484 url('../img/backgroundImg.png') repeat bottom;
+    background-size: 80%;
 }
 #listedPeople{
     display:flex;
@@ -65,10 +66,11 @@ section {
     height: 100vh;
     width: 85%;
     right: 0;
-    background-color: #777;
     overflow-y: hidden;
     display: flex;
     flex-direction: column;
+    background: #dddddd url('../img/backgroundImg4.png') repeat bottom;
+    background-size: 20%;
 }
 
 
@@ -137,6 +139,16 @@ section {
     /* min-width: 5em; */
 }
 
+#connectionMsg{
+    text-align: center;
+    background-color: #ddd;
+    color: #222;
+    clear: both;
+    border-radius: 0.5em;
+    margin: 0.5em auto;
+    /* min-width: 5em; */
+}
+
 #senderImg{
     color: black;
     float: right;
@@ -165,33 +177,137 @@ section {
     position: fixed;
     width: 100%;
     height: 100%;
-    background-color: #2F343B;
     z-index: 2;
     display: block;
+    background: #484 url('../img/backgroundImg.png') repeat bottom;
 }
 
-#launcherInput{
-    position: fixed;
+#register, #forgotPass{
+    position: absolute;
+    width: 30%;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-   
-    width: 50%;
-    height: 4%;
+    flex-direction: column;
+    background: #222;
+    border: 5px #fff solid;
+    border-radius: 0.5em;
+    padding: 60px 20px;
+}
+
+.register, .forgotPass{
+    display: none;
+}
+
+.register-open, .forgotPass-open{
+    display: flex;
+}
+
+#register input, #forgotPass input{
+    margin-top: 2px;
+    margin-bottom: 15px;
+    width: 100%;
+    font-size: 3.5em;
+}
+
+#register label, #forgotPass label{
+    color:#fff;
+    font-size: 1.5em;
+}
+
+#register-btn, #forgotPass-btn{
+    display: block;
+    border: none;
+    width: 30%;
+    right: 0;
+    height: 3.5em;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.btn-close{
+    background: #444;
+    border: none;
+    cursor: pointer;
+    height: 50px;
+    width: 50px;
+    top: 0;
+    right: 0;
+    position: absolute;
+    margin: 0;
+    font-size: 3em;
+    color: #fff
+}
+
+#login {
+    position: absolute;
+    display: flex;
+    width: 30%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+    background: rgba(0,0,0,0.5);
+    padding: 90px 30px 30px 30px;
+    border-radius: 0.5em;
+}
+
+#login input{
+    margin-top: 15px;
+    width: 100%;
+    font-size: 3.5em;
+    border: none;
+    padding: 5px;
+}
+
+#login button {
+    display: block;
+    border: none;
+    width: 30%;
+    float: left;
+    /* right: 0; */
+    /*height: 3.5em;*/
+    margin-top: 60px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 2em;
+    padding: 5px;
+}
+
+#loginButtons{
+    width: 100%;
+}
+
+#redundantLogin{
+    display: none;
+    left: 0;
+    bottom: 0;
+    width: 300px;
+    height: 200px;
+    position: fixed;
+    flex-direction: column;
+}
+
+#launcherInput{
+    /* position: absolute; */
+    /* top: 50%; */
+    /* left: 50%; */
+    /* transform: translate(-50%, -50%); */
+    /* width: 50%; */
+    /* height: 4%; */
     font-size: 3.5em;
     text-align: center;
     border: 0;
 
 }
 #launcherButton{
-    position: fixed;
-    top: 55%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-   
-    width: 25%;
-    height: 4%;
-    font-size: 3.5em;
+    /* position: absolute; */
+    /* top: 55%; */
+    /* left: 50%; */
+    /* transform: translate(-50%, -50%); */
+    /* width: 25%; */
+    /* height: 4%; */
+    /* font-size: 3.5em; */
     text-align: center;
     background-color: #7f7b7b;
     border: 0;
