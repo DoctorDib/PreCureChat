@@ -1,33 +1,40 @@
-* { 
-    margin: 0; padding: 0; box-sizing: border-box; 
+* {
+    margin: 0; padding: 0; box-sizing: border-box;
 }
-body { 
-    font:    13px Helvetica, Arial; 
+body {
+    font:    13px Helvetica, Arial;
 }
 form {
     position: relative;
     bottom: 0;
     width: 100%;
-    height: 3em;
+    /* height: 4em; */
     border: 0;
+    background: #ccc;
+    padding: 10px;
+    display: flex;
 }
 form input {
     width: 90%;
-    height: 100%;
+    /* height: 100%; */
     font-size: 2em;
     border: 0;
-    padding: 0.5em;
+    padding: 0.2em;
     background-color: #dbdbdb;
-    
+    border-radius: 0.1em;
+
 }
 form button {
     width: 10%;
     background: #cbcbcb;
-    position: absolute;
+    /* position: absolute; */
     font-size: 2em;
-    height: 100%;
+    /* height: 100%; */
     border: 0;
-    cursor: pointer;-webkit-transition: all 1s ease-out;
+    cursor: pointer;
+    margin-left: 10px;
+    border-radius: 0.1em;
+    -webkit-transition: all 1s ease-out;
     -moz-transition: all 1s ease-out;
     -o-transition: all 1s ease-out;
     transition: all 1s ease-out;
@@ -37,16 +44,21 @@ form button:hover {
     box-shadow: inset 1px 2px 4px #555;
 }
 
+#mobile-send{
+    display: none;
+    background: #aaa;
+    color: #fff;
+}
 
 section {
-    position: absolute; 
+    position: absolute;
 }
 #left form{
     width: 15%;
 }
 #left {
     height: 100%;
-    width: 15%;
+    width: 30%;
     left: 0;
     color: #fff;
     overflow-y: auto;
@@ -64,12 +76,12 @@ section {
 
 #right{
     height: 100vh;
-    width: 85%;
+    width: 70%;
     right: 0;
     overflow-y: hidden;
     display: flex;
     flex-direction: column;
-    background: #dddddd url('../img/backgroundImg4.png') repeat bottom;
+    background: #dddddd url(../img/backgroundImg4.png) repeat bottom;
     background-size: 20%;
 }
 
@@ -195,11 +207,78 @@ section {
     padding: 60px 20px;
 }
 
-.register, .forgotPass{
-    display: none;
+
+#leftAccount {
+    height: 100%;
+    width: 50%;
+    left: 0;
+    color: #fff;
+    overflow-y: auto;
+    -webkit-box-shadow: -5px 0px 8px 8px rgba(0,0,0,1);
+    -moz-box-shadow: -5px 0px 8px 8px rgba(0,0,0,1);
+    box-shadow: -5px 0px 10px 6px rgba(0,0,0,1);
+    z-index: 1;
+    background: #183e5a;
+    position: fixed;
 }
 
-.register-open, .forgotPass-open{
+#rightAccount{
+    height: 100%;
+    width: 50%;
+    right: 0;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    background: #dddddd;
+    position: fixed;
+}
+
+
+
+
+#friends {
+    margin-top: 2em;
+    margin-left: auto;
+    margin-right: auto;
+    min-width: 25%;
+    max-width: 75%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+.onlineFriend {
+    margin-top: 3em;
+    display: inline-block;
+}
+
+.profilePics {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    display: block;
+    float: left;
+    border: 0.2em solid #8a0000;
+}
+.online{
+    border: 0.3em solid #1db300;
+}
+
+.profileNames {
+    float: left;
+    font-size: 2em;
+    margin-top: 5%;
+    margin-left: 1em;
+}
+
+
+
+
+.register, .forgotPass, .accountPage-close, .mainChat, .leftAccount-close{
+    display: none;
+    z-index: 0;
+}
+
+.register-open, .forgotPass-open, .mainChat-open, .accountPage{
     display: flex;
 }
 
@@ -215,7 +294,7 @@ section {
     font-size: 1.5em;
 }
 
-#register-btn, #forgotPass-btn{
+#register-btn, #forgotPass-btn {
     display: block;
     border: none;
     width: 30%;
@@ -236,7 +315,8 @@ section {
     position: absolute;
     margin: 0;
     font-size: 3em;
-    color: #fff
+    color: #fff;
+    z-index: 5;
 }
 
 #login {
@@ -397,18 +477,18 @@ img{
 }
 
 @media only screen and (max-width: 1000px) {
-    
+
     #right{
         width: 100%;
     }
     #left{
         width: 0;
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
+        box-shadow: none;
     }
     #left form{
         display: none;
-    }
-    #right form{
-        height: 6%;
     }
 
     li{
@@ -417,3 +497,40 @@ img{
 
 }
 
+@media only screen and (max-width: 600px){
+    #login{
+        width: 100%;
+        left: 0;
+        transform: translate(0, -50%);
+    }
+    #mobile-send{
+        display:block;
+    }
+    #desktop-send {
+        display:none;
+    }
+    form input{
+        font-size: unset;
+    }
+    #right{
+        background: #dddddd url(../img/backgroundImg4.png) repeat bottom;
+        background-size: 100%;
+    }
+    .custom-scroll::-webkit-scrollbar-track
+    {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        background-color: #F5F5F5;
+    }
+
+    .custom-scroll::-webkit-scrollbar
+    {
+        width: 6px;
+        background-color: #F5F5F5;
+    }
+
+    .custom-scroll::-webkit-scrollbar-thumb
+    {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+        background-color: #555;
+    }
+}

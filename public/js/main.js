@@ -7,7 +7,7 @@ var user = '';
 
 var message = {};
 
-// lastCacheMsh - Always holds the latest up-to-date message. 
+// lastCacheMsh - Always holds the latest up-to-date message.
 var lastCacheMsg = '';
 
 
@@ -71,7 +71,7 @@ jQuery(window).focus(function(){
 
 // FIRST TIME LAUNCHER  - submit() will run once the launcher button has been clicked.
 var submit = function(uData) {
-    var socket = io();
+    var sockets = io('/');
     USERNAME = uData.uName;//document.getElementById('launcherInput').value;
     token = {
         token: uData.token,
@@ -80,14 +80,22 @@ var submit = function(uData) {
     document.cookie = 'token=' + token.token + '--- expires=' + token.expiry + ';';
     // className slugifies USERNAME
     className = uData.uID;//.replace(/\s/g, '_');
-    socket.emit('username', USERNAME);
+
     user = USERNAME;
+
+    console.log("lkfjas;dlkfja;sldkjf;alskdjf;laskjd;lfkasjd;lfk" + USERNAME);
+    sockets.emit('testing', 'a');
+    console.log('Kek me');
+
+
+
+
     if(USERNAME !== ''){
         var disp = jQuery('#launcher')[0];
         disp.style.display = "none";
         setTimeout(function(){
             loggedIn = true;
-            socket.emit('login', USERNAME);
+            sockets.emit('login', USERNAME);
 
 
             }, 100);
@@ -101,10 +109,13 @@ var submit = function(uData) {
 
 
 //jQuery(function () {
-var loggedInTime = function(){
+//var loggedInTime = function(){
+function loggedInTime(){
     var socket = io();
+    //socket.emit('testing', 'a');
     // A unique value that no user will accidentally type. (1/1000000000000 chance(Probably more))
     var usersTyping = [];
+    socket.emit('newUserConnection', USERNAME);
 
     // Sends current value in input box to the server.
     jQuery('#messageInput').submit(function(){
@@ -128,19 +139,21 @@ var loggedInTime = function(){
     });
 
     socket.on('login', function(user){
-        if(user !== USERNAME){
-            var msgTag = document.createElement('div');
-            msgTag.id = 'messageTag';
-            msgTag.innerHTML = user + ' has logged in!';
-            jQuery('#messages').append($('<li id="connectionMsg" style="margin: 0.5em auto;" class="' + className + '">').append(msgTag));
-            $('#messages').scrollTop($('#messages')[0].scrollHeight);
-        }
+
+        var msgTag = document.createElement('div');
+
+        msgTag.id = 'messageTag';
+        msgTag.innerHTML = user + ' has logged in!';
+        jQuery('#messages').append($('<li id="connectionMsg" style="margin: 0.5em auto;" class="' + className + '">').append(msgTag));
+        $('#messages').scrollTop($('#messages')[0].scrollHeight);
+
     });
 
     socket.on('disconnect', function(user){
         if(user === "transport close"){
             location.reload();
         }
+
         if(user !== USERNAME){
             var msgTag = document.createElement('div');
             msgTag.id = 'messageTag';
@@ -189,16 +202,16 @@ var loggedInTime = function(){
             } else {
                 jQuery('#messages').append(jQuery('<li id="recieverVideo">').append(jQuery('<p>').html(userName.bold())).append(jQuery('<video src="' + message + '" class="video" alt="sent by ' + userName + '" />')));
             }
-			
-			
+
+
 			$('.video').mouseover(function(){
 				jQuery(this).get(0).play();
 			}).mouseout(function(){
 				jQuery(this).get(0).pause();
 			})
-		
+
         } else if(message.includes('https://www.youtube.com/watch?') || message.includes('https://youtu.be/')){
-			var splitter = message.includes('https://www.youtube.com/watch?') ? message.split('=')[1] : message.split('/').pop();
+		    var splitter = message.includes('https://www.youtube.com/watch?') ? message.split('=')[1] : message.split('/').pop();
 			message = 'https://www.youtube.com/embed/' + splitter.split('&')[0];
 			if(user === userName){
                 jQuery('#messages').append(jQuery('<li id="senderYT">').append(jQuery('<iFrame src="' + message + '" class="video" alt="sent by ' + userName + '" />')))
@@ -209,28 +222,32 @@ var loggedInTime = function(){
             // Retyping the message either from sender or reciever.
             if (boolRetype === true) {
                 if (user === userName) {
-                    jQuery('#messages li#sender:last')[0].innerHTML = message;
+                    jQuery('#messages li#sender:last')[0].innerHTML = '<span>' + message + '</span>';
                 } else {
-                    jQuery('#messages li#reciever.' + className + ':last div#messageTag')[0].innerHTML = message;
+                    jQuery('#messages li#reciever.' + className + ':last div#messageTag')[0].innerHTML = '<span>' + message + '</span>';
                 }
                 reType = false;
             } else {
                 // Default message send.
                 if (user === userName) {
-                    jQuery('#messages').append($('<li id="sender" class="' + className + '">').text(message));
+                    var msgBox = document.createElement('li');
+                    msgBox.id = 'sender';
+                    msgBox.className = className;
+                    msgBox.innerHTML = '<span>' + message + '</span>';
+                    jQuery('#messages').append(msgBox);//($('<li id="sender" class="' + className + '">').text(message));
                 } else {
                     var userTag = document.createElement('div');
                     userTag.id = 'nameTag';
                     userTag.innerHTML = userName.bold();
                     var msgTag = document.createElement('div');
                     msgTag.id = 'messageTag';
-                    msgTag.innerHTML = message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    msgTag.innerHTML = '<span>' + message + '</span>';
                     jQuery('#messages').append($('<li id="reciever" class="' + className + '">').append(userTag).append(msgTag));}
                     //jQuery('#messages').append($('<li id="reciever" class="' + className + '">').append($('<div id="nameTag">').html(userName.bold()) + $('<div id="messageTag">').html(message)));}
             }
         }
 
-            $('#messages').scrollTop($('#messages')[0].scrollHeight);
+        $('#messages').scrollTop($('#messages')[0].scrollHeight);
 
     });
 
@@ -262,7 +279,7 @@ var loggedInTime = function(){
         socket.emit("typing", typingObj);
     }
 
-    // [USERNAME] is typing... 
+    // [USERNAME] is typing...
     // Sets value to check if you're typing.
     jQuery('#m').keyup(function() {
         typing = true;
@@ -275,17 +292,17 @@ var loggedInTime = function(){
         timeout = setTimeout(timeoutFunction, 2000);
     });
 
-    // Will input the data into a <P> tag.    
+    // Will input the data into a <P> tag.
     socket.on('typing', function(data) {
-            if (data.typing && data.userName !== USERNAME) {
-            if($.inArray(data.userName, usersTyping) === -1) {
-                usersTyping.push(data.userName);
+        if (data.typing && data.userName !== USERNAME) {
+        if($.inArray(data.userName, usersTyping) === -1) {
+            usersTyping.push(data.userName);
+        }
+            if(usersTyping.length > 1) {
+                jQuery('.typing').html(usersTyping.join(", ") + ' is typing...');
+            } else {
+                jQuery('.typing').html(usersTyping[0] + ' is typing...');
             }
-                if(usersTyping.length > 1) {
-                    jQuery('.typing').html(usersTyping.join(", ") + ' is typing...');
-                } else {
-                    jQuery('.typing').html(usersTyping[0] + ' is typing...');
-                }
 
         } else {
             if(data.userName !== USERNAME) {
@@ -353,6 +370,11 @@ function toggleRegister(){
 function toggleForgotPass(){
     $('#forgotPass').toggleClass('forgotPass-open');
 }
+function toggleAccount(){
+    $('#accountPage').toggleClass('accountPage-close');
+    $('#mainChat').toggleClass('mainChat-open');
+    $('#leftAccount').toggleClass('leftAccount-close');
+}
 
 function signupAcc(){
     $('#regEmail')[0].style.border = 'none';
@@ -403,22 +425,40 @@ function signupAcc(){
             userE: $('#regEmail').val(),
             userP: $('#regPWord').val()
         };
-        //loginSocket.emit('registerAccount', uDetails);
+        loginSocket.emit('registerAccount', uDetails);
     }
 }
 
 function loginUser(){
+    console.log("DFSGSDFGSDFGSDFGSDFG")
     var uDetails = {
         userN: $('#loginUName').val(),
         userP: $('#loginPWord').val()
     };
     loginSocket.emit('login', uDetails);
+
 }
 
 loginSocket.on('doLogin', function(dName){
+
+    console.log('Lmao');
     submit(dName);
+
 });
+
 
 function forgotPassword(email){
     // The forgot password goes here, okay?
+}
+
+function Search(){
+    var socket = io();
+
+    var username = jQuery('#search_user')[0].value;
+
+    socket.emit('searchUser', username)
+
+    socket.on('userdata', function (id) {
+        $("#leftAccount").load('../content/' + id + '.html')
+    })
 }

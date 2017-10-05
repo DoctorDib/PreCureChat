@@ -6,13 +6,13 @@
     <link rel="stylesheet" type="text/css" href="/css/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-   
+
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
     <!--<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
       <script src="js/push.js"></script>
-    
+
     <script type="text/javascript" src="/js/main.js"></script>
 
 
@@ -55,32 +55,63 @@
         </div>
 
         <div id="forgotPass" class="forgotPass">
-            <button onclick='toggleForgotPass()' class="btn-close">XD</button>
+            <button onclick='toggleForgotPass()' class="btn-close">X</button>
             <label for="regEmail">Email</label>
             <input name="Email" id="fpEmail"/>
             <button onclick='forgotPassword()' id="forgotPass-btn">Send email</button>
         </div>
-    </section>
-
-    <section id='left'>
-        <p id='numofPeople'> </p>
-
-        <ul id="listedPeople"></ul>
-    
-    </section>
-
-    <section id='right'>
-        
-        <ul id="messages" class="custom-scroll"></ul>
-
-        <form action="" id="messageInput">
-            <p class="typing"> </p>
-            <input id="m" autocomplete="off" autofocus/> <button>Send</button>
-        </form>
 
     </section>
 
-    
+    <div id="accountPage" class="accountPage">
+        <button onclick='toggleAccount()' class="btn-close">X</button>
+
+        <div id="leftAccount">
+
+            <ul id="friends">
+                <h1> FRIENDS ONLINE </h1>
+                <li class="onlineFriend" onClick="createRoot(" + ID + ")"> <img src='UserData/img/default_pic.jpg' class="profilePics online"> </img> <h1 class="profileNames"> Test Account </h1> </li>
+                <li class="onlineFriend"> <img src='UserData/img/default_pic.jpg' class="profilePics online"> </img> <h1 class="profileNames"> James </h1> </li>
+                <li class="onlineFriend"> <img src='UserData/img/default_pic.jpg' class="profilePics"> </img> <h1 class="profileNames"> Jake </h1> </li>
+            </ul>
+
+            <input id='search_user'> </input>
+            <button onClick='Search()' style='height: 100px; width: 200px;'> SEARCH HERE </button>
+
+            <div id='user_search_results'> </div>
+
+        </div>
+
+        <div id="rightAccount">
+            <section>
+                <h1> Settings </h1>
+            </section>
+        </div>
+    </div>
+
+    <div id="mainChat" class="mainChat">
+        <section id='left'>
+            <p id='numofPeople'> </p>
+
+            <ul id="listedPeople"></ul>
+
+        </section>
+
+        <section id='right'>
+
+            <ul id="messages" class="custom-scroll"></ul>
+
+            <form action="" id="messageInput">
+                <p class="typing"> </p>
+                <input id="m" autocomplete="off" autofocus/>
+                <button id="desktop-send">Send</button>
+                <button id="mobile-send">></button>
+            </form>
+        </section>
+
+    </div>
+
+
 
   </body>
 </html>

@@ -1,5 +1,6 @@
 //Hashing algorithm
 var sha256 = require('js-sha256');
+var msgFormat = require('./messageFormat');
 
 var express = require('express');
 var path = require('path');
@@ -37,6 +38,7 @@ var pool = new Pool(config);
 // =====================================================================================================
 var signupNS = io.of('/login');
 signupNS.on('connection', function(socket){
+    console.log(socket.id);
     socket.on('registerAccount', function(uDetails){
         create_account(uDetails);
     });
@@ -46,6 +48,10 @@ signupNS.on('connection', function(socket){
         if(dName !== false){
             socket.emit('doLogin', dName);
         }
+    });
+
+    socket.on('testing', function(){
+        console.log('AAAAAAAAAAAAAAAAAAAAA');
     });
 
     socket.on('tokenLogin', async function(token){
@@ -101,6 +107,9 @@ async function checkToken(token){
         const queryText = 'SELECT display_name, id FROM user_collection WHERE token = $1 AND token_expire > $2::timestamp;';
         const values = [token.token, tokenExpire];
         const res = await pool.query(queryText, values);
+
+        setOnline(res.rows[0].id, true);
+
         if(res.rowCount === 1){
             return {
                 uName: res.rows[0].display_name,
@@ -116,19 +125,39 @@ async function checkToken(token){
     }
 }
 
+async function setOnline(id, online){
+    try {
+
+        const queryText = 'UPDATE user_collection SET is_online = $2 WHERE id = $1;';
+        const values = [id, online];
+
+        const res = await pool.query(queryText, values);
+
+    } catch(e) {
+        console.log(e);
+    }
+}
+
 async function create_account(userDetails){
     var uName = userDetails.userN;
     var dName = userDetails.userD;
     var email = userDetails.userE;
     var pWord = userDetails.userP;
     var token = generateToken(uName, dName);
-    uName = sha256(uName);
-    pWord += sha256(uName);
+    pWord += sha256(sha256(uName));
     pWord = sha256(pWord);
     try {
-        const queryText = 'INSERT INTO user_collection (username, password, email, create_date, display_name, token, token_expire) VALUES($1, $2, $3, NOW(), $4, $5, $6);';
-        const values = [uName, pWord, email, dName, token.token, token.expiry];
-        const res = await pool.query(queryText, values);
+        const checkerQueryText = 'SELECT * FROM user_collection WHERE username=$1 OR email=$2;';
+        const checkerValues = [uName, email];
+        const check = await pool.query(checkerQueryText, checkerValues);
+        if(check.rowCount === 0) {
+            const queryText = 'INSERT INTO user_collection (username, password, email, create_date, display_name, token, token_expire) VALUES($1, $2, $3, NOW(), $4, $5, $6);';
+            const values = [uName, pWord, email, dName, token.token, token.expiry];
+            const res = await pool.query(queryText, values);
+            return true;
+        } else {
+            return false;
+        }
     } catch(e) {
         console.log(e.stack);
     }
@@ -153,20 +182,24 @@ async function create_account(userDetails){
 
 async function login_account(userDetails){
     var uName = userDetails.userN;
-    uName = sha256(uName);
     var pWord = userDetails.userP;
-    pWord += sha256(uName);
+    pWord += sha256(sha256(uName));
     pWord = sha256(pWord);
 
     try {
         const queryText = 'SELECT display_name, id FROM user_collection WHERE username = $1 AND password = $2;';
         const values = [uName, pWord];
         const res = await pool.query(queryText, values);
-        var uID = res.rows[0].id;
         if(res.rowCount === 1){
+            var uID = res.rows[0].id;
             var token = await generateToken(uName, uName);
             const queryText = 'UPDATE user_collection SET token = $1, token_expire = $2 WHERE id = $3';
             const values = [token.token, token.expiry, uID];
+
+            setOnline(uID, true);
+
+
+
             const res2 = await pool.query(queryText, values);
             return {
                 uName: res.rows[0].display_name,
@@ -198,8 +231,32 @@ app.get('/', function(req, res){
 
 
 io.on('connection', function(socket){
+    console.log('New Connection!');
+
+    socket.on('searchUser', async function(data){
+        const queryText = 'SELECT id FROM user_collection WHERE username = $1;';
+        const values = [data];
+        const res = await pool.query(queryText, values);
+
+        var userid = res.rows[0].id;
+
+        console.log(userid)
+
+        socket.emit('userdata', userid)
+
+    });
+
+
+    socket.on('testing', function(a){
+        console.log('sdfgsdflkjdhflkjghsldkfjghlkhsjdfhlgksjdflkgsjdhflkhjg');
+    });
+
+    socket.on('login', function(a){
+        console.log('sdfgsdflkjdhflkjghsldkfjghlkhsjdfhlgksjdflkgsjdhflkhjg');
+    });
 
     socket.on('chat message', function(msg){
+        msg.msg = msgFormat.parseMessage(msg.msg);
         io.emit('chat message', msg);
     });
 
@@ -207,24 +264,30 @@ io.on('connection', function(socket){
         io.emit('typing', msg);
     });
 
-    socket.on('username', function(msg){
-        var socketId = socket.id;
-        var ip = socket.request.connection.remoteAddress;
+    socket.on('newUserConnection', function(msg){
+        console.log(msg);
+        try {
+            console.log("HFLGSLDKFLASDKFLSghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghDKFLKL")
+            var socketId = socket.id;
+            var ip = socket.request.connection.remoteAddress;
 
-        ip = ip.split(':').pop();
+            ip = ip.split(':').pop();
 
-        listedPeople.push({'id':socketId, 'name':msg});
+            listedPeople.push({'id':socketId, 'name':msg});
 
-        var clientData = {'id':socketId, 'name':msg};
+            var clientData = {'id':socketId, 'name':msg};
 
-        io.emit('people', currentOnline);// + ' == = == ' + currentOnline.length);
+            io.emit('people', currentOnline);// + ' == = == ' + currentOnline.length);
 
-        console.log("[New Connection: " + "  -  " + msg + "  -  " + socketId + "  -  " + ip + ']');
+            console.log("[New Connection: " + "  -  " + msg + "  -  " + socketId + ']');
+        } catch(e){
+            console.log(e);
+        }
     });
 
     //io.emit('people', currentOnline + ' == = == ' + currentOnline.length);
 
-    socket.on('disconnect', function(socket){
+    socket.on('disconnect', async function(socket){
 
         var clients = Object.keys(io.sockets.connected);
         var onlineCache = currentOnline;
@@ -234,6 +297,8 @@ io.on('connection', function(socket){
         //io.emit('debug', socket);
 
         try {
+            //setOnline(id, false);
+
             for(i = 0; i<clients.length;i++){
                 for(p = 0; p<listedPeople.length ; p++){
                     if(clients[i] === listedPeople[p].id){
@@ -244,6 +309,18 @@ io.on('connection', function(socket){
             for(var x = 0; x<listedPeople.length; x++){
                 if(!currentOnline.includes(listedPeople[x])){
                     io.emit('disconnect', listedPeople[x].name);
+
+                    const queryText = 'SELECT id FROM user_collection WHERE username = $1';
+                    const values = [listedPeople[x].name];
+
+                    var results = await pool.query(queryText, values);
+                    var id = results.rows[0].id;
+                    console.log(id)
+
+                    setOnline(id, false);
+
+
+
                     break;
                 }
             }
@@ -261,4 +338,3 @@ io.on('connection', function(socket){
 
 
 Server.listen(443, 'precure.ddns.net');
-
