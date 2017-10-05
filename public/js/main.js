@@ -26,6 +26,8 @@ var notifSound = new Audio('./sound/NewMessage.mp3');
 var loggedIn = false;
 var loginSocket = io('/login');
 
+var socket = io();
+
 var checkCookie = function (token){
 
     try {
@@ -66,6 +68,36 @@ jQuery(window).focus(function(){
     inactiveMessageCount = 0;
 });
 
+
+
+function collectUserData(userName){
+    var socket = io();
+
+    socket.emit('searchUser', userName);
+
+    socket.on('userdata', function (userInfo) {
+
+        //INFORMATION SET HERE
+
+        //$('#prolfie_banner_img').attr('src', userInfo.bannerPic);
+        $('#profile_banner')[0].style.backgroundImage = 'url("' + userInfo.bannerPic +'")'; //('src', userInfo.bannerPic);
+        $('#profile_img')[0].style.backgroundImage = 'url("' + userInfo.proPic + '")';//.attr('src', userInfo.proPic);
+
+        $('#profile_name').html('@'+userInfo.uName);
+        $('#profile_display_name').html(userInfo.dName);
+
+        var online = userInfo.online === true ? 'Online' : 'Offline';
+        $('#profile_status').html(online);
+
+        $('#profile_bio').html(userInfo.bio);
+
+        var friends = userInfo.friendArr;
+
+        /*for(i=0; i < (friends.length || 0); i++){
+            jQuery('#friends').append(jQuery('<li class="onlineFriend">').append(jQuery('<h1 class="profilePics">').html(friends[i])))
+        }*/
+    })
+}
 
 
 
@@ -321,8 +353,6 @@ function loggedInTime(){
 
 };
 
-
-
 // Function taken from the net - Places your cursor at the end of the sentence.
 jQuery.fn.putCursorAtEnd = function() {
     return this.each(function() {
@@ -342,8 +372,6 @@ jQuery.fn.putCursorAtEnd = function() {
         this.scrollTop = 999999;
     });
 };
-
-
 
 // EDIT PREVIOUS MESSAGE
 $(document).keydown(function(e) {
@@ -367,11 +395,13 @@ window.setTimeout(function(){
 function toggleRegister(){
     $('#register').toggleClass('register-open');
 }
+
 function toggleForgotPass(){
     $('#forgotPass').toggleClass('forgotPass-open');
 }
+
 function toggleAccount(){
-    $('#accountPage').toggleClass('accountPage-close');
+    $('#account_page').toggleClass('account_page_open');
     $('#mainChat').toggleClass('mainChat-open');
     $('#leftAccount').toggleClass('leftAccount-close');
 }
@@ -436,29 +466,52 @@ function loginUser(){
         userP: $('#loginPWord').val()
     };
     loginSocket.emit('login', uDetails);
-
 }
 
-loginSocket.on('doLogin', function(dName){
-
+loginSocket.on('doLogin', function(uData){
+    collectUserData(uData.uName);
     console.log('Lmao');
-    submit(dName);
-
+    submit(uData);
 });
-
 
 function forgotPassword(email){
     // The forgot password goes here, okay?
 }
 
 function Search(){
+    var username = jQuery('#search_user')[0].value;
     var socket = io();
 
-    var username = jQuery('#search_user')[0].value;
+    console.log("Hello");
+    socket.emit('listByUserName', username);
+    console.log("Goodbye");
 
-    socket.emit('searchUser', username)
+    socket.on('listResults', function(listResults) {
+        $('#user_search_results').html('');
 
-    socket.on('userdata', function (id) {
-        $("#leftAccount").load('../content/' + id + '.html')
-    })
+        $.each(listResults, function (i, row) {
+            jQuery('#user_search_results').append(
+                jQuery('<div id="list_account" onClick="collectUserData(\'' + row.username + '\')" style="cursor: pointer;">').append(
+                    jQuery('<div id="account_img" class="account_status_offline">').css('background-image', 'url("'+row.picture+'")'),
+                    jQuery('<div id="account_user_names">').append(
+                        jQuery('<span id="account_display_name">').html(row.display_name),
+                        jQuery('<span id="account_user_name">').html('@'+row.username)
+                    )
+                )
+            );
+            console.log(row);
+        });
+    });
+
+    collectUserData(username);
+}
+
+var searchTimeout = null;
+function searchKeyUp(){
+    console.log('your nan');
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(function () {
+        Search();
+        }
+    , 500);
 }

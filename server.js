@@ -147,12 +147,13 @@ async function create_account(userDetails){
     pWord += sha256(sha256(uName));
     pWord = sha256(pWord);
     try {
-        const checkerQueryText = 'SELECT * FROM user_collection WHERE username=$1 OR email=$2;';
+        const checkerQueryText = 'SELECT * FROM user_collection WHERE LOWER(username)=LOWER($1) OR email=$2;';
         const checkerValues = [uName, email];
         const check = await pool.query(checkerQueryText, checkerValues);
         if(check.rowCount === 0) {
-            const queryText = 'INSERT INTO user_collection (username, password, email, create_date, display_name, token, token_expire) VALUES($1, $2, $3, NOW(), $4, $5, $6);';
-            const values = [uName, pWord, email, dName, token.token, token.expiry];
+            const defaultImg = '../UserData/img/default_pic.jpg';
+            const queryText = 'INSERT INTO user_collection (username, password, email, create_date, display_name, token, token_expire, picture) VALUES($1, $2, $3, NOW(), $4, $5, $6, $7);';
+            const values = [uName, pWord, email, dName, token.token, token.expiry, defaultImg];
             const res = await pool.query(queryText, values);
             return true;
         } else {
@@ -234,16 +235,46 @@ io.on('connection', function(socket){
     console.log('New Connection!');
 
     socket.on('searchUser', async function(data){
-        const queryText = 'SELECT id FROM user_collection WHERE username = $1;';
+        const queryText = 'SELECT * FROM user_collection WHERE username = $1;';
         const values = [data];
         const res = await pool.query(queryText, values);
 
         var userid = res.rows[0].id;
+        var username = res.rows[0].username;
+        var displayname = res.rows[0].display_name;
+        var userpic = res.rows[0].picture;
+        var useronline = res.rows[0].is_online;
 
-        console.log(userid)
+        var listFriends = JSON.parse(res.rows[0].friends);
 
-        socket.emit('userdata', userid)
+        var accountData = JSON.parse(res.rows[0].account_data);
 
+        var bioData = accountData.bio;
+        var bannerData = accountData.banner;
+
+        var userInfo = {
+            id:  userid,
+            uName: username,
+            dName: displayname,
+            proPic: userpic,
+            bannerPic: bannerData,
+            online: useronline,
+            bio: bioData,
+            friendArr: listFriends
+        };
+
+        socket.emit('userdata', userInfo)
+
+    });
+
+    socket.on('listByUserName', async function(searchedU){
+        try{
+            const queryText = "SELECT username, display_name, picture FROM user_collection WHERE LOWER(username) LIKE LOWER($1) OR LOWER(display_name) LIKE LOWER($1)";
+            const values = ['%'+searchedU+'%'];
+            const res = await pool.query(queryText, values);
+            socket.emit('listResults', res.rows);
+        } catch(e){ console.log(e)
+        }
     });
 
 

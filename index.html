@@ -1,117 +1,116 @@
 <!DOCTYPE html>
 <html>
-  <head>
+    <head>
 
-    <title>Precure chat</title>
-    <link rel="stylesheet" type="text/css" href="/css/style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-    <!--<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
-      <script src="js/push.js"></script>
-
-    <script type="text/javascript" src="/js/main.js"></script>
+        <title>Precure chat</title>
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+        <script src="js/push.js"></script>
+        <script type="text/javascript" src="/js/main.js"></script>
 
 
-  </head>
-  <body>
+    </head>
+    <body>
 
-    <section id='launcher'>
+        <section id='launcher'>
 
-        <h1 id='launcherTitle'> PreCure </h1>
+            <h1 id='launcherTitle'> PreCure </h1>
 
-        <div id="redundantLogin">
-            <input id='launcherInput'> </input>
-            <button onclick='submit()' id='launcherButton'> Enter Room </button>
-        </div>
-
-        <div id="login">
-            <input title="Username" id="loginUName"/>
-            <input title="Password" type="password" id="loginPWord"/>
-            <div id="loginButtons">
-                <button onclick='loginUser()' style="float: right;">Login</button>
-                <button onclick='toggleRegister()'>Register</button>
+            <div id="redundantLogin">
+                <input id='launcherInput'> </input>
+                <button onclick='submit()' id='launcherButton'> Enter Room </button>
             </div>
-            <a onclick='toggleForgotPass()' style='cursor:pointer; display: none'> FORGOT PASSWORD OMGOMGOMG </a>
-        </div>
 
-        <div id="register" class="register">
-            <button onclick='toggleRegister()' class="btn-close">X</button>
-            <div id="regError"></div>
-            <label for="regUName">Username</label>
-            <input name="Username" id="regUName"/>
-            <label for="regDName">Display Name</label>
-            <input name="DisplayName" id="regDName"/>
-            <label for="regEmail">Email</label>
-            <input name="Email" id="regEmail"/>
-            <label for="regPWord">Password</label>
-            <input name="Password" type="password" id="regPWord"/>
-            <label for="regPWordC">Confirm Password</label>
-            <input name="Password" type="password" id="regPWordC"/>
-            <button onclick='signupAcc()' id="register-btn">Register</button>
-        </div>
+            <div id="login">
+                <input title="Username" id="loginUName"/>
+                <input title="Password" type="password" id="loginPWord"/>
+                <div id="loginButtons">
+                    <button onclick='loginUser()' style="float: right;">Login</button>
+                    <button onclick='toggleRegister()'>Register</button>
+                </div>
+                <a onclick='toggleForgotPass()' style='cursor:pointer; display: none'> FORGOT PASSWORD OMGOMGOMG </a>
+            </div>
 
-        <div id="forgotPass" class="forgotPass">
-            <button onclick='toggleForgotPass()' class="btn-close">X</button>
-            <label for="regEmail">Email</label>
-            <input name="Email" id="fpEmail"/>
-            <button onclick='forgotPassword()' id="forgotPass-btn">Send email</button>
-        </div>
+            <div id="register" class="register">
+                <button onclick='toggleRegister()' class="btn-close">X</button>
+                <div id="regError"></div>
+                <label for="regUName">Username</label>
+                <input name="Username" id="regUName"/>
+                <label for="regDName">Display Name</label>
+                <input name="DisplayName" id="regDName"/>
+                <label for="regEmail">Email</label>
+                <input name="Email" id="regEmail"/>
+                <label for="regPWord">Password</label>
+                <input name="Password" type="password" id="regPWord"/>
+                <label for="regPWordC">Confirm Password</label>
+                <input name="Password" type="password" id="regPWordC"/>
+                <button onclick='signupAcc()' id="register-btn">Register</button>
+            </div>
 
-    </section>
+            <div id="forgotPass" class="forgotPass">
+                <button onclick='toggleForgotPass()' class="btn-close">X</button>
+                <label for="regEmail">Email</label>
+                <input name="Email" id="fpEmail"/>
+                <button onclick='forgotPassword()' id="forgotPass-btn">Send email</button>
+            </div>
 
-    <div id="accountPage" class="accountPage">
+        </section>
+
+
         <button onclick='toggleAccount()' class="btn-close">X</button>
-
-        <div id="leftAccount">
-
-            <ul id="friends">
-                <h1> FRIENDS ONLINE </h1>
-                <li class="onlineFriend" onClick="createRoot(" + ID + ")"> <img src='UserData/img/default_pic.jpg' class="profilePics online"> </img> <h1 class="profileNames"> Test Account </h1> </li>
-                <li class="onlineFriend"> <img src='UserData/img/default_pic.jpg' class="profilePics online"> </img> <h1 class="profileNames"> James </h1> </li>
-                <li class="onlineFriend"> <img src='UserData/img/default_pic.jpg' class="profilePics"> </img> <h1 class="profileNames"> Jake </h1> </li>
-            </ul>
-
-            <input id='search_user'> </input>
-            <button onClick='Search()' style='height: 100px; width: 200px;'> SEARCH HERE </button>
-
-            <div id='user_search_results'> </div>
-
+        <div id="account_page" class="account_page">
+            <div id="profile_banner">
+                <!--<img id="proflie_banner_img" src='UserData/banner/default_banner.jpg' style="position:absolute; width: 100%; z-index:-1;"> </img>-->
+            </div>
+            <div id="profile_content">
+                <div id="profile_img_container">
+                    <div id="profile_img" class="account_status_online"></div>
+                </div>
+                <h1 id="profile_status"> </h1>
+                <h1 id="profile_display_name"> </h1>
+                <h1 id="profile_name"> </h1>
+                <p id="profile_bio"> </p>
+            </div>
         </div>
 
-        <div id="rightAccount">
-            <section>
-                <h1> Settings </h1>
+        <div id="friends_list">
+            <ul id="friends"></ul>
+        </div>
+
+        <div id="accountList">
+            <div id="search_bar">
+                <input id='search_user' onkeyup="searchKeyUp()"/>
+                <button onClick='Search()' style='height: 100px; width: 200px;'> SEARCH HERE </button>
+            </div>
+            <div id='user_search_results'>
+                <div id="account">
+                    <img src="image.png"/>
+                    <div id="search_user_names">
+                        <span>Display Name</span>
+                        <span>Username</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mainChat" class="mainChat">
+            <section id='left'>
+                <p id='numofPeople'> </p>
+                <ul id="listedPeople"></ul>
+            </section>
+
+            <section id='right'>
+                <ul id="messages" class="custom-scroll"></ul>
+                <form action="" id="messageInput">
+                    <p class="typing"> </p>
+                    <input id="m" autocomplete="off" autofocus/>
+                    <button id="desktop-send">Send</button>
+                    <button id="mobile-send">></button>
+                </form>
             </section>
         </div>
-    </div>
 
-    <div id="mainChat" class="mainChat">
-        <section id='left'>
-            <p id='numofPeople'> </p>
-
-            <ul id="listedPeople"></ul>
-
-        </section>
-
-        <section id='right'>
-
-            <ul id="messages" class="custom-scroll"></ul>
-
-            <form action="" id="messageInput">
-                <p class="typing"> </p>
-                <input id="m" autocomplete="off" autofocus/>
-                <button id="desktop-send">Send</button>
-                <button id="mobile-send">></button>
-            </form>
-        </section>
-
-    </div>
-
-
-
-  </body>
+    </body>
 </html>
