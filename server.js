@@ -1,3 +1,6 @@
+// =====================================================================================================================
+// SETUP
+// =====================================================================================================================
 //Hashing algorithm
 var sha256 = require('js-sha256');
 var msgFormat = require('./messageFormat');
@@ -17,11 +20,10 @@ var options = {
 var https = require('https');
 var Server = https.createServer(options, app);
 var io = require('socket.io')(Server);
-var port = process.env.PORT || 443;
 
-// =====================================================================================================
+// =====================================================================================================================
 // DATABSE SETUP
-// =====================================================================================================
+// =====================================================================================================================
 
 var Pool = require('pg').Pool;
 var config = {
@@ -33,12 +35,12 @@ var config = {
 
 var pool = new Pool(config);
 
-// ======================================================================================================
+// =====================================================================================================================
 // DATABASE FUNCTIONS
-// =====================================================================================================
+// =====================================================================================================================
 var signupNS = io.of('/login');
 signupNS.on('connection', function(socket){
-    console.log(socket.id);
+    // console.log(socket.id);
     socket.on('registerAccount', function(uDetails){
         create_account(uDetails);
     });
@@ -63,6 +65,9 @@ signupNS.on('connection', function(socket){
         }
     });
 });
+// =====================================================================================================================
+// TOKENS
+// =====================================================================================================================
 
 function generateToken(uName, dName){
     return {
@@ -104,14 +109,15 @@ function getDateTime(increase) {
 async function checkToken(token){
     try {
         var tokenExpire = getDateTime(0);
-        const queryText = 'SELECT display_name, id FROM user_collection WHERE token = $1 AND token_expire > $2::timestamp;';
+        const queryText = 'SELECT username, display_name, id FROM user_collection WHERE token = $1 AND token_expire > $2::timestamp;';
         const values = [token.token, tokenExpire];
         const res = await pool.query(queryText, values);
 
-        setOnline(res.rows[0].id, true);
+        setOnline(res.rows[0].id, 1);
 
         if(res.rowCount === 1){
             return {
+                username: res.rows[0].username,
                 uName: res.rows[0].display_name,
                 uID: res.rows[0].id,
                 token: token.token,
@@ -124,19 +130,23 @@ async function checkToken(token){
         return false;
     }
 }
-
+// =====================================================================================================================
+// SETTING ONLINE
+// =====================================================================================================================
 async function setOnline(id, online){
     try {
 
-        const queryText = 'UPDATE user_collection SET is_online = $2 WHERE id = $1;';
+        const queryText = 'UPDATE user_collection SET user_status = $2 WHERE id = $1;';
         const values = [id, online];
 
         const res = await pool.query(queryText, values);
 
     } catch(e) {
-        console.log(e);
     }
 }
+// =====================================================================================================================
+// CREATE ACCOUNT
+// =====================================================================================================================
 
 async function create_account(userDetails){
     var uName = userDetails.userN;
@@ -163,6 +173,7 @@ async function create_account(userDetails){
         console.log(e.stack);
     }
 }
+// =====================================================================================================================
 
 
 // CHANGING PASSWORD
@@ -181,6 +192,9 @@ async function create_account(userDetails){
 //      |
 // CHANGING PASSWORD
 
+// =====================================================================================================================
+// USER LOGIN
+// =====================================================================================================================
 async function login_account(userDetails){
     var uName = userDetails.userN;
     var pWord = userDetails.userP;
@@ -188,7 +202,7 @@ async function login_account(userDetails){
     pWord = sha256(pWord);
 
     try {
-        const queryText = 'SELECT display_name, id FROM user_collection WHERE username = $1 AND password = $2;';
+        const queryText = 'SELECT username, display_name, id FROM user_collection WHERE username = $1 AND password = $2;';
         const values = [uName, pWord];
         const res = await pool.query(queryText, values);
         if(res.rowCount === 1){
@@ -197,12 +211,13 @@ async function login_account(userDetails){
             const queryText = 'UPDATE user_collection SET token = $1, token_expire = $2 WHERE id = $3';
             const values = [token.token, token.expiry, uID];
 
-            setOnline(uID, true);
+            setOnline(uID, 1);
 
 
 
             const res2 = await pool.query(queryText, values);
             return {
+                username: res.rows[0].username,
                 uName: res.rows[0].display_name,
                 uID: res.rows[0].id,
                 token: token.token,
@@ -216,13 +231,79 @@ async function login_account(userDetails){
         return false;
     }
 }
-// =====================================================================================================
+// =====================================================================================================================
+// PRIVATE CHAT ROOM
+// =====================================================================================================================
 
+var rooms = [];
+function Room(roomName){
+    var room = io.of('/' + roomName);
+    room.on('connection', function(socket){
+        // console.log('Someone has connected to: ' + roomName);
+        var socketCache = socket;
+        console.log('New Connection!');
 
+        // Calls when a users status changes
+        socket.on('setStatus', async function(username, status){
+            try{
+                const queryText = "UPDATE user_collection SET user_status = $1 WHERE username=$2";
+                const values = [status, username];
+                const res = await pool.query(queryText, values);
+            } catch(e){ console.log(e)
+            }
+        });
 
+        // Calls when a user searches the user list
+        socket.on('userSearch', async function(searchedU){
+            try{
+                const queryText = "SELECT username, display_name, picture, user_status FROM user_collection WHERE LOWER(username) LIKE LOWER($1) OR LOWER(display_name) LIKE LOWER($1)";
+                const values = ['%'+searchedU+'%'];
+                const res = await pool.query(queryText, values);
+                socket.emit('listResults', res.rows);
+            } catch(e){ console.log(e)
+            }
+        });
 
-var listedPeople = [];
-var currentOnline = [];
+        // Calls when a user send a message
+        socket.on('onMessage', function(msg){
+            console.log('Message Recieved!');
+            msg.msg = msgFormat.parseMessage(msg.msg);
+            room.emit('onMessage', msg);
+        });
+
+        // Calls when a user types
+        socket.on('typing', function(booleanType){
+            room.emit('typing', booleanType);
+        });
+
+        // Calls when a user logs
+        socket.on('login', async function(username){
+            socket.username = username;
+            room.emit('people', await getOnlineUsers());
+            console.log(username + ' has logged into to: ' + roomName);
+            console.log("[New Connection: " + "  -  " + username + "  -  " + socket.id + ']');
+        });
+
+        // Called when a user disconnects
+        socket.on('disconnect', async function(socket){
+            console.log('disconnect');
+            console.log(socketCache.username);
+            room.emit('people', await getOnlineUsers());
+        });
+
+        // Update user list
+        async function updateList(){
+            room.emit('people', await getOnlineUsers());
+            setTimeout(updateList, 30000);
+        }
+        setTimeout(updateList, 30000);
+    });
+};
+
+rooms.push(new Room('test'));
+rooms.push(new Room('testicles'));
+
+// =====================================================================================================================
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -230,142 +311,18 @@ app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
 });
 
-
 io.on('connection', function(socket){
-    console.log('New Connection!');
-
-    socket.on('searchUser', async function(data){
-        const queryText = 'SELECT * FROM user_collection WHERE username = $1;';
-        const values = [data];
-        const res = await pool.query(queryText, values);
-
-        var userid = res.rows[0].id;
-        var username = res.rows[0].username;
-        var displayname = res.rows[0].display_name;
-        var userpic = res.rows[0].picture;
-        var useronline = res.rows[0].is_online;
-
-        var listFriends = JSON.parse(res.rows[0].friends);
-
-        var accountData = JSON.parse(res.rows[0].account_data);
-
-        var bioData = accountData.bio;
-        var bannerData = accountData.banner;
-
-        var userInfo = {
-            id:  userid,
-            uName: username,
-            dName: displayname,
-            proPic: userpic,
-            bannerPic: bannerData,
-            online: useronline,
-            bio: bioData,
-            friendArr: listFriends
-        };
-
-        socket.emit('userdata', userInfo)
-
+    // Calls when a user logs
+    socket.on('leaveRoom', function(oldRoom, newRoom){
+        socket.join('/' + newRoom);
+        socket.leave('/' + oldRoom);
     });
-
-    socket.on('listByUserName', async function(searchedU){
-        try{
-            const queryText = "SELECT username, display_name, picture FROM user_collection WHERE LOWER(username) LIKE LOWER($1) OR LOWER(display_name) LIKE LOWER($1)";
-            const values = ['%'+searchedU+'%'];
-            const res = await pool.query(queryText, values);
-            socket.emit('listResults', res.rows);
-        } catch(e){ console.log(e)
-        }
-    });
-
-
-    socket.on('testing', function(a){
-        console.log('sdfgsdflkjdhflkjghsldkfjghlkhsjdfhlgksjdflkgsjdhflkhjg');
-    });
-
-    socket.on('login', function(a){
-        console.log('sdfgsdflkjdhflkjghsldkfjghlkhsjdfhlgksjdflkgsjdhflkhjg');
-    });
-
-    socket.on('chat message', function(msg){
-        msg.msg = msgFormat.parseMessage(msg.msg);
-        io.emit('chat message', msg);
-    });
-
-    socket.on('typing', function(msg){
-        io.emit('typing', msg);
-    });
-
-    socket.on('newUserConnection', function(msg){
-        console.log(msg);
-        try {
-            console.log("HFLGSLDKFLASDKFLSghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghDKFLKL")
-            var socketId = socket.id;
-            var ip = socket.request.connection.remoteAddress;
-
-            ip = ip.split(':').pop();
-
-            listedPeople.push({'id':socketId, 'name':msg});
-
-            var clientData = {'id':socketId, 'name':msg};
-
-            io.emit('people', currentOnline);// + ' == = == ' + currentOnline.length);
-
-            console.log("[New Connection: " + "  -  " + msg + "  -  " + socketId + ']');
-        } catch(e){
-            console.log(e);
-        }
-    });
-
-    //io.emit('people', currentOnline + ' == = == ' + currentOnline.length);
-
-    socket.on('disconnect', async function(socket){
-
-        var clients = Object.keys(io.sockets.connected);
-        var onlineCache = currentOnline;
-        currentOnline = [];
-        var onlinePeople = listedPeople;
-
-        //io.emit('debug', socket);
-
-        try {
-            //setOnline(id, false);
-
-            for(i = 0; i<clients.length;i++){
-                for(p = 0; p<listedPeople.length ; p++){
-                    if(clients[i] === listedPeople[p].id){
-                        currentOnline.push(listedPeople[p])
-                    }
-                }
-            }
-            for(var x = 0; x<listedPeople.length; x++){
-                if(!currentOnline.includes(listedPeople[x])){
-                    io.emit('disconnect', listedPeople[x].name);
-
-                    const queryText = 'SELECT id FROM user_collection WHERE username = $1';
-                    const values = [listedPeople[x].name];
-
-                    var results = await pool.query(queryText, values);
-                    var id = results.rows[0].id;
-                    console.log(id)
-
-                    setOnline(id, false);
-
-
-
-                    break;
-                }
-            }
-            listedPeople = currentOnline;
-        } catch (e) { console.log(e)
-        }
-
-        io.emit('people', currentOnline);// + ' == = == ' + currentOnline.length);
-
-    });
-
-
 });
 
-
+async function getOnlineUsers(){
+    const queryText = "SELECT username, display_name, picture, user_status FROM user_collection WHERE user_status != 0";
+    const res = await pool.query(queryText);
+    return res.rows
+}
 
 Server.listen(443, 'precure.ddns.net');

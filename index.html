@@ -14,6 +14,7 @@
     </head>
     <body>
 
+
         <section id='launcher'>
 
             <h1 id='launcherTitle'> PreCure </h1>
@@ -60,7 +61,7 @@
 
 
         <button onclick='toggleAccount()' class="btn-close">X</button>
-        <div id="account_page" class="account_page">
+        <div id="account_page" class="account_page" style="display:none">
             <div id="profile_banner">
                 <!--<img id="proflie_banner_img" src='UserData/banner/default_banner.jpg' style="position:absolute; width: 100%; z-index:-1;"> </img>-->
             </div>
@@ -72,36 +73,31 @@
                 <h1 id="profile_display_name"> </h1>
                 <h1 id="profile_name"> </h1>
                 <p id="profile_bio"> </p>
+                <p id="profile_friends"> </p>
             </div>
         </div>
 
-        <div id="friends_list">
+        <div id="friends_list"style="display:none">
             <ul id="friends"></ul>
         </div>
 
-        <div id="accountList">
-            <div id="search_bar">
-                <input id='search_user' onkeyup="searchKeyUp()"/>
-                <button onClick='Search()' style='height: 100px; width: 200px;'> SEARCH HERE </button>
-            </div>
-            <div id='user_search_results'>
-                <div id="account">
-                    <img src="image.png"/>
-                    <div id="search_user_names">
-                        <span>Display Name</span>
-                        <span>Username</span>
-                    </div>
-                </div>
-            </div>
+        <div id="accountList" style="display:none">
+            <!--<div id="search_bar">-->
+                <!--<input id='search_user' onkeyup="searchKeyUp()"/>-->
+                <!--&lt;!&ndash;<button onClick='Search()' style='height: 100px; width: 200px;'> SEARCH HERE </button>&ndash;&gt;-->
+            <!--</div>-->
+            <!--<div id='user_search_results'></div>-->
         </div>
 
         <div id="mainChat" class="mainChat">
             <section id='left'>
-                <p id='numofPeople'> </p>
+                <button onclick='connectToRoom("test")'>Join Test</button>
+                <button onclick='connectToRoom("testicles")'>Join Testicles</button>
+                <p id='numofPeople'>Online:</p>
                 <ul id="listedPeople"></ul>
             </section>
 
-            <section id='right'>
+            <section id='center'>
                 <ul id="messages" class="custom-scroll"></ul>
                 <form action="" id="messageInput">
                     <p class="typing"> </p>
@@ -109,6 +105,13 @@
                     <button id="desktop-send">Send</button>
                     <button id="mobile-send">></button>
                 </form>
+            </section>
+            <section id="right">
+                <div id="search_bar">
+                    <input id='search_user' onkeyup="searchKeyUp()"/>
+                    <!--<button onClick='Search()' style='height: 100px; width: 200px;'> SEARCH HERE </button>-->
+                </div>
+                <div id='user_search_results'></div>
             </section>
         </div>
 

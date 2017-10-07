@@ -1,20 +1,25 @@
+//======================================================================================================================
+// USER SETUP
+//======================================================================================================================
 // USERNAME - To identify the sender.
 // className - Slugified version of USERNAME (Each user has their own class when sending a message)
 // user - Helps identify if the message was sent from the sender.
 var USERNAME = '';
-var className = '';
-var user = '';
-
+var DISPLAYNAME = '';
+var UID = '';
+// var user = '';
+//======================================================================================================================
+// MESSAGE SETUP
+//======================================================================================================================
 var message = {};
 
 // lastCacheMsh - Always holds the latest up-to-date message.
 var lastCacheMsg = '';
-
-
 // reTyep - will set when the user clicks up arrow.
 var reType = false;
-
-
+//======================================================================================================================
+// 
+//======================================================================================================================
 var timeout;
 
 // Inactive session boolean.
@@ -23,26 +28,25 @@ var activeSession = true;
 var inactiveMessageCount = 0;
 // Changable notification sound.
 var notifSound = new Audio('./sound/NewMessage.mp3');
-var loggedIn = false;
+var isLoggedIn = false;
 var loginSocket = io('/login');
-
-var socket = io();
-
+var roomSockets = [];
+var socket;
+var connected = false;
+//======================================================================================================================
+// COOKIES + TOKENS
+//======================================================================================================================
 var checkCookie = function (token){
 
     try {
         var cookies = token.split('---');
-
         var cookies_obj = {
             token: cookies[0].split('=')[1],
             expiry: cookies[1].split('=')[1]
         };
-
-
+        
         return cookies_obj;
-    } catch(err){
-        return false;
-    }
+    } catch(err){ return false; }
 };
 
 // MAKE IT DETECT IF COOKIE
@@ -55,12 +59,16 @@ function tokenCheck(){
 }
 
 tokenCheck();
-
+//======================================================================================================================
+// ACTIVITY DETECTION
+//======================================================================================================================
 // .blur and .focus will detect if your current active window is the chatroom.
+
 // Clicked off screen.
 jQuery(window).blur(function(){
     activeSession = false;
 });
+
 // Clicked on screen.
 jQuery(window).focus(function(){
     activeSession = true;
@@ -68,240 +76,251 @@ jQuery(window).focus(function(){
     inactiveMessageCount = 0;
 });
 
-
-
-function collectUserData(userName){
-    var socket = io();
-
-    socket.emit('searchUser', userName);
-
-    socket.on('userdata', function (userInfo) {
-
-        //INFORMATION SET HERE
-
-        //$('#prolfie_banner_img').attr('src', userInfo.bannerPic);
-        $('#profile_banner')[0].style.backgroundImage = 'url("' + userInfo.bannerPic +'")'; //('src', userInfo.bannerPic);
-        $('#profile_img')[0].style.backgroundImage = 'url("' + userInfo.proPic + '")';//.attr('src', userInfo.proPic);
-
-        $('#profile_name').html('@'+userInfo.uName);
-        $('#profile_display_name').html(userInfo.dName);
-
-        var online = userInfo.online === true ? 'Online' : 'Offline';
-        $('#profile_status').html(online);
-
-        $('#profile_bio').html(userInfo.bio);
-
-        var friends = userInfo.friendArr;
-
-        /*for(i=0; i < (friends.length || 0); i++){
-            jQuery('#friends').append(jQuery('<li class="onlineFriend">').append(jQuery('<h1 class="profilePics">').html(friends[i])))
-        }*/
-    })
+var isAway = false;
+function setAway() {
+    socket.emit('setStatus', USERNAME, 2);
+    isAway = true;
 }
 
+var awayTimeout; // Used to store the timeout function
 
-
-// FIRST TIME LAUNCHER  - submit() will run once the launcher button has been clicked.
-var submit = function(uData) {
-    var sockets = io('/');
-    USERNAME = uData.uName;//document.getElementById('launcherInput').value;
-    token = {
-        token: uData.token,
-        expiry: uData.tokenExpire
-    };
-    document.cookie = 'token=' + token.token + '--- expires=' + token.expiry + ';';
-    // className slugifies USERNAME
-    className = uData.uID;//.replace(/\s/g, '_');
-
-    user = USERNAME;
-
-    console.log("lkfjas;dlkfja;sldkjf;alskdjf;laskjd;lfkasjd;lfk" + USERNAME);
-    sockets.emit('testing', 'a');
-    console.log('Kek me');
-
-
-
-
-    if(USERNAME !== ''){
-        var disp = jQuery('#launcher')[0];
-        disp.style.display = "none";
-        setTimeout(function(){
-            loggedIn = true;
-            sockets.emit('login', USERNAME);
-
-
-            }, 100);
-        loggedInTime();
-        //loggedIn = true;
-    } else {
-        alert('Please enter your username!');
-    }
+// Called on un focus
+window.onblur = function(){
+    clearTimeout(awayTimeout);
+    awayTimeout = setTimeout(setAway, 30000);
 };
 
+// called on focus
+window.onfocus = function(){
+    clearTimeout(awayTimeout);
+    if(isAway){
+        isAway = false;
+        socket.emit('setStatus', USERNAME, 1);
+    }
+};
+//======================================================================================================================
+// LOGGED IN - Called when a user is logged in
+//           - Also sets up the socket connection
+//======================================================================================================================
+function loggedIn(){
+    // If the user isn't connected, connect
+    if(!connected){
+        socket = io();
+        connected = true;
+    }
 
+    // Tell the server we have logged in
+    socket.emit('login', USERNAME);
+};
 
-//jQuery(function () {
-//var loggedInTime = function(){
-function loggedInTime(){
-    var socket = io();
-    //socket.emit('testing', 'a');
-    // A unique value that no user will accidentally type. (1/1000000000000 chance(Probably more))
+//======================================================================================================================
+// ROOM CODE
+//======================================================================================================================
+
+var rooms = {};
+var currentRoom = '';
+
+// Changes the connected room
+function connectToRoom(roomName){
+    try{
+        rooms[currentRoom].isLoggedIn = false;
+    } catch(e){}
+    socket = io('/' + roomName);
+    rooms[roomName] = new Room(socket);
+    rooms[roomName].isLoggedIn = true;
+    currentRoom = roomName;
+}
+
+//--------------------
+// ROOM OBJECT
+//--------------------
+function Room(socket){
+    this.isLoggedIn = false;
+    var this_ = this;
+
     var usersTyping = [];
-    socket.emit('newUserConnection', USERNAME);
-
-    // Sends current value in input box to the server.
-    jQuery('#messageInput').submit(function(){
-        //reType - Whether they are editing their previous message.
-        // USERNAME - The users name tag.
-        // className - the slugified name of USERNAME to help identify when editting personal message.
-        // jQuery('#m').val() - The message.
-            message = {edit: reType, user: USERNAME, classN: className, msg: jQuery('#m').val()};
-
-        if(loggedIn) {
-            socket.emit('chat message', message);
+    var account_status = {
+        0: 'account_status_offline',
+        1: 'account_status_online',
+        2: 'account_status_away',
+        3: 'account_status_busy'
+    };
+    // -----------------------------------------------
+    // SEND MESSAGE TO SERVER - Sends current value in input box to the server.
+    // -----------------------------------------------
+    jQuery('#messageInput').submit(function(e){
+        if(this_.isLoggedIn) {
+            message = {edit: reType, user: USERNAME, classN: UID, msg: jQuery('#m').val()};
+            socket.emit('onMessage', message);
             timeoutFunction();
-        }
-
             lastCacheMsg = jQuery('#m').val();
-
-            $('#messages').scrollTop($('#messages')[0].scrollHeight);
-
+            jQuery('#messages').scrollTop(jQuery('#messages')[0].scrollHeight);
             jQuery('#m').val('');
             return false;
+        }
     });
 
+    // -----------------------------------------------
+    // DETECTS LOGIN | DEPRECATED
+    // -----------------------------------------------
     socket.on('login', function(user){
+        if(this_.isLoggedIn) {
 
-        var msgTag = document.createElement('div');
-
-        msgTag.id = 'messageTag';
-        msgTag.innerHTML = user + ' has logged in!';
-        jQuery('#messages').append($('<li id="connectionMsg" style="margin: 0.5em auto;" class="' + className + '">').append(msgTag));
-        $('#messages').scrollTop($('#messages')[0].scrollHeight);
-
-    });
-
-    socket.on('disconnect', function(user){
-        if(user === "transport close"){
-            location.reload();
-        }
-
-        if(user !== USERNAME){
             var msgTag = document.createElement('div');
+
             msgTag.id = 'messageTag';
-            msgTag.innerHTML = user + ' has disconnected!';
-            jQuery('#messages').append($('<li id="connectionMsg" style="margin: 0.5em auto;" class="' + className + '">').append(msgTag));
-            $('#messages').scrollTop($('#messages')[0].scrollHeight);
+            msgTag.innerHTML = user + ' has logged in!';
+            jQuery('#messages').append($('<li id="connectionMsg" style="margin: 0.5em auto;" class="' + UID + '">').append(msgTag));
+            jQuery('#messages').scrollTop(jQuery('#messages')[0].scrollHeight);
         }
     });
 
-    // Recieving message from server.
-    socket.on('chat message', function(msg){
-        // Collects data by splitting at space.
+    // -----------------------------------------------
+    // DETECTS DISCONNECT
+    // -----------------------------------------------
+    socket.on('disconnect', function(user){
+        if(this_.isLoggedIn) {
+            if (user === "transport close") {
+                location.reload();
+            }
 
-        var boolRetype = msg.edit;
-        var userName = msg.user;
-        var className = msg.classN;
-        var message = msg.msg;
+            if (user !== USERNAME) {
+                var msgTag = document.createElement('div');
+                msgTag.id = 'messageTag';
+                msgTag.innerHTML = user + ' has disconnected!';
+                jQuery('#messages').append($('<li id="connectionMsg" style="margin: 0.5em auto;" class="' + UID + '">').append(msgTag));
+                //messages.scrollTop(messages[0].scrollHeight);
+            }
+        }
+    });
 
-        // When recieveing message, it will check whether current chatroom is active.
-        if(activeSession === false && !boolRetype){
-            inactiveMessageCount += 1;
-            document.title = inactiveMessageCount;
+    // -----------------------------------------------
+    // RETRIEVING MESSAGE FROM SERVER
+    // -----------------------------------------------
+    socket.on('onMessage', function(msg){
+        if(this_.isLoggedIn) {
+            // Collects data by splitting at space.
 
-            notifSound.play();
-            Push.create("You have new messages!",{
-                body: userName + ": " + message,
-                timeout: 5000,
-                icon: '../img/NotificationIcon.jpg',
-                onClick: function(){window.focus();Push.clear()},
-                vibrate: [200, 100, 200, 100, 200, 100, 200]
+            var boolRetype = msg.edit;
+            var userName = msg.user;
+            var className = msg.classN;
+            var message = msg.msg;
+
+            // When receiving message, it will check whether current chatroom is active.
+            if (activeSession === false && !boolRetype) {
+                inactiveMessageCount += 1;
+                document.title = inactiveMessageCount;
+
+                notifSound.play();
+                Push.create("You have new messages!", {
+                    body: userName + ": " + message,
+                    timeout: 5000,
+                    icon: '../img/NotificationIcon.jpg',
+                    onClick: function () {
+                        window.focus();
+                        Push.clear()
+                    },
+                    vibrate: [200, 100, 200, 100, 200, 100, 200]
+                });
+            }
+
+            // splits to check if the last value is one of the below image/gif formats.
+            var img = message.split('.').pop();
+            // First checks whether it's an image or not.
+            if (jQuery.inArray(img, ["gif", "jpg", "jpeg", "png"]) !== -1) {
+                var msgid = USERNAME === userName ? "senderImg" : "recieverImg";
+                jQuery('#messages').append(
+                    jQuery('<li id="'+msgid+'">').append(
+                        USERNAME === userName ? jQuery('<img src="' + message + '" alt="sent by ' + userName + '" />') : (jQuery('<p>').html(userName.bold()), jQuery('<img src="' + message + '" alt="sent by ' + userName + '" />'))
+                    )
+                );
+            // Is the message a video?
+            } else if (jQuery.inArray(img, ['mp4', 'wmv', 'mov', 'flv', 'webm']) !== -1) {
+                var msgid = USERNAME === userName ? "senderVideo" : "recieverVideo";
+                jQuery('#messages').append(
+                    jQuery('<li id="'+msgid+'">').append(
+                        jQuery('<video src="' + message + '" class="video" alt="sent by ' + userName + '" />')
+                    )
+                );
+
+                // Play the video on mouse over
+                $('.video').mouseover(function () {
+                    jQuery(this).get(0).play();
+                }).mouseout(function () {
+                    jQuery(this).get(0).pause();
+                })
+
+            // Is the message a youtube video?
+            } else if (message.includes('https://www.youtube.com/watch?') || message.includes('https://youtu.be/')) {
+                var splitter = message.includes('https://www.youtube.com/watch?') ? message.split('=')[1] : message.split('/').pop();
+                message = 'https://www.youtube.com/embed/' + splitter.split('&')[0];
+                var msgid = USERNAME === userName ? "senderYT" : "recieverYT";
+                jQuery('#messages').append(
+                    jQuery('<li id="'+msgid+'">').append(
+                        USERNAME === userName ? jQuery('<iFrame src="' + message + '" class="video" alt="sent by ' + userName + '" />') : (jQuery('<p>').html(userName.bold()), jQuery('<iFrame src="' + message + '" class="video" alt="sent by ' + userName + '" />'))
+                    )
+                );
+
+            // Nah it's just a normal one
+            } else {
+                // Retyping the message either from sender or reciever.
+                if (boolRetype === true) {
+                    if (USERNAME === userName) {
+                        jQuery('#messages li#sender:last')[0].innerHTML = '<span>' + message + '</span>';
+                    } else {
+                        jQuery('#messages li#reciever.' + className + ':last div#messageTag')[0].innerHTML = '<span>' + message + '</span>';
+                    }
+                    reType = false;
+                } else {
+                    // Default message send.
+                    if (USERNAME === userName) {
+                        var msgBox = document.createElement('li');
+                        msgBox.id = 'sender';
+                        msgBox.className = className;
+                        msgBox.innerHTML = '<span>' + message + '</span>';
+                        jQuery('#messages').append(msgBox);
+                    } else {
+                        var userTag = document.createElement('div');
+                        userTag.id = 'nameTag';
+                        userTag.innerHTML = userName.bold();
+                        var msgTag = document.createElement('div');
+                        msgTag.id = 'messageTag';
+                        msgTag.innerHTML = '<span>' + message + '</span>';
+                        jQuery('#messages').append($('<li id="reciever" class="' + className + '">').append(userTag).append(msgTag));
+                    }
+                }
+            }
+
+            jQuery('#messages').scrollTop(jQuery('#messages')[0].scrollHeight);
+        }
+    });
+
+    // -----------------------------------------------
+    // LIST ONLINE USERS - This function lists every active user in session to the left hand side.
+    // -----------------------------------------------
+    socket.on('people', function(onlineList){
+        if(this_.isLoggedIn) {
+            // Resets list
+            jQuery('#listedPeople').html('');
+
+            $.each(onlineList, function (i, row) {
+                jQuery('#listedPeople').append(
+                    // jQuery('<div id="list_account" onClick="collectUserData(\'' + row.username + '\')" style="cursor: pointer;">').append(
+                    jQuery('<div id="list_account" onClick="" style="cursor: pointer;">').append(
+                        jQuery('<div id="account_img" class="' + account_status[row.user_status] + '">').css('background-image', 'url("' + row.picture + '")'),
+                        jQuery('<div id="account_user_names">').append(
+                            jQuery('<span id="account_display_name">').html(row.display_name),
+                            jQuery('<span id="account_user_name">').html('@' + row.username)
+                        )
+                    )
+                )
             });
         }
-
-        // splits to check if the last value is one of the below image/gif formats.
-        var img = message.split('.').pop();
-        // First checks whether it's an image or not.
-        if(jQuery.inArray(img, ["gif", "jpg", "jpeg", "png"]) !== -1){
-            if(user === userName){
-                jQuery('#messages').append(jQuery('<li id="senderImg">').append(jQuery('<img src="' + message + '" alt="sent by ' + userName + '" />')))
-            } else {
-                jQuery('#messages').append(jQuery('<li id="recieverImg">').append(jQuery('<p>').html(userName.bold())).append(jQuery('<img src="' + message + '" alt="sent by ' + userName + '" />')));
-            }
-		} else if(jQuery.inArray(img, ['mp4', 'wmv', 'mov', 'flv']) !== -1){
-			if(user === userName){
-                jQuery('#messages').append(jQuery('<li id="senderVideo">').append(jQuery('<video src="' + message + '" class="video" alt="sent by ' + userName + '" />')))
-            } else {
-                jQuery('#messages').append(jQuery('<li id="recieverVideo">').append(jQuery('<p>').html(userName.bold())).append(jQuery('<video src="' + message + '" class="video" alt="sent by ' + userName + '" />')));
-            }
-
-
-			$('.video').mouseover(function(){
-				jQuery(this).get(0).play();
-			}).mouseout(function(){
-				jQuery(this).get(0).pause();
-			})
-
-        } else if(message.includes('https://www.youtube.com/watch?') || message.includes('https://youtu.be/')){
-		    var splitter = message.includes('https://www.youtube.com/watch?') ? message.split('=')[1] : message.split('/').pop();
-			message = 'https://www.youtube.com/embed/' + splitter.split('&')[0];
-			if(user === userName){
-                jQuery('#messages').append(jQuery('<li id="senderYT">').append(jQuery('<iFrame src="' + message + '" class="video" alt="sent by ' + userName + '" />')))
-            } else {
-                jQuery('#messages').append(jQuery('<li id="recieverYT">').append(jQuery('<p>').html(userName.bold())).append(jQuery('<iFrame src="' + message + '" class="video" alt="sent by ' + userName + '" />')));
-            }
-		}else {
-            // Retyping the message either from sender or reciever.
-            if (boolRetype === true) {
-                if (user === userName) {
-                    jQuery('#messages li#sender:last')[0].innerHTML = '<span>' + message + '</span>';
-                } else {
-                    jQuery('#messages li#reciever.' + className + ':last div#messageTag')[0].innerHTML = '<span>' + message + '</span>';
-                }
-                reType = false;
-            } else {
-                // Default message send.
-                if (user === userName) {
-                    var msgBox = document.createElement('li');
-                    msgBox.id = 'sender';
-                    msgBox.className = className;
-                    msgBox.innerHTML = '<span>' + message + '</span>';
-                    jQuery('#messages').append(msgBox);//($('<li id="sender" class="' + className + '">').text(message));
-                } else {
-                    var userTag = document.createElement('div');
-                    userTag.id = 'nameTag';
-                    userTag.innerHTML = userName.bold();
-                    var msgTag = document.createElement('div');
-                    msgTag.id = 'messageTag';
-                    msgTag.innerHTML = '<span>' + message + '</span>';
-                    jQuery('#messages').append($('<li id="reciever" class="' + className + '">').append(userTag).append(msgTag));}
-                    //jQuery('#messages').append($('<li id="reciever" class="' + className + '">').append($('<div id="nameTag">').html(userName.bold()) + $('<div id="messageTag">').html(message)));}
-            }
-        }
-
-        $('#messages').scrollTop($('#messages')[0].scrollHeight);
-
     });
 
-    // This function is list every active user in session to the left hand side.
-    socket.on('people', function(onlineList){
-
-        var numberOfPeople = onlineList.length;//msg.split(' == = == ')[1];
-        var listOfPeople = onlineList;//msg.split(' == = == ')[0];
-
-        //listOfPeople = listOfPeople.split(',');
-
-        jQuery('.Remove').remove();
-
-        for(np = 0; np<listOfPeople.length; np++){
-            jQuery('#listedPeople').append($('<li class="Remove">').text(listOfPeople[np].name));
-        }
-
-        jQuery('#numofPeople')[0].innerHTML = 'Current Online: ' + numberOfPeople;
-
-    });
-
-    // typing will change depending on whether you're typing.
+    // -----------------------------------------------
+    // TYPING TRIGGER - Triggers when a user is typing.
+    // -----------------------------------------------
     function timeoutFunction() {
         typing = false;
         var typingObj = {
@@ -326,52 +345,72 @@ function loggedInTime(){
 
     // Will input the data into a <P> tag.
     socket.on('typing', function(data) {
-        if (data.typing && data.userName !== USERNAME) {
-        if($.inArray(data.userName, usersTyping) === -1) {
-            usersTyping.push(data.userName);
-        }
-            if(usersTyping.length > 1) {
-                jQuery('.typing').html(usersTyping.join(", ") + ' is typing...');
+        if(this_.isLoggedIn) {
+            if (data.typing && data.userName !== USERNAME) {
+                if ($.inArray(data.userName, usersTyping) === -1) {
+                    usersTyping.push(data.userName);
+                }
+                if (usersTyping.length > 1) {
+                    jQuery('.typing').html(usersTyping.join(", ") + ' is typing...');
+                } else {
+                    jQuery('.typing').html(usersTyping[0] + ' is typing...');
+                }
+
             } else {
-                jQuery('.typing').html(usersTyping[0] + ' is typing...');
-            }
-
-        } else {
-            if(data.userName !== USERNAME) {
-                var index = usersTyping.indexOf(data.userName);
-                usersTyping.splice(index, 1);
-                jQuery('.typing').html("");
+                if (data.userName !== USERNAME) {
+                    var index = usersTyping.indexOf(data.userName);
+                    usersTyping.splice(index, 1);
+                    jQuery('.typing').html("");
+                }
             }
         }
     });
+}
+//======================================================================================================================
+// USER LOGIN BUTTON - submit() will run once the launcher button has been clicked.
+//======================================================================================================================
+function submit(uData) {
+    // Setup user variables
+    USERNAME = uData.username;
+    DISPLAYNAME = uData.uName;
+    token = {
+        token: uData.token,
+        expiry: uData.tokenExpire
+    };
+    document.cookie = 'token=' + token.token + '--- expires=' + token.expiry + ';';
+    className = uData.uID;
 
-    socket.on('debug', function(data){
-        console.log('--- DEBUG DATA ---');
-        console.log(data);
-        console.log('--- END DEBUG DATA ---');
-    });
-
+    jQuery('#launcher')[0].style.display = "none";
+    setTimeout(function(){
+        isLoggedIn = true;
+        // sockets.emit('login', USERNAME);
+    }, 100);
+    loggedIn();
+    //loggedIn = true;
 };
+
 
 // Function taken from the net - Places your cursor at the end of the sentence.
 jQuery.fn.putCursorAtEnd = function() {
     return this.each(function() {
-        var $el = $(this),
-        el = this;
-        if (!$el.is(":focus")) {
-            $el.focus();
+        var $element = $(this),
+        element = this;
+        if (!$element.is(":focus")) {
+            $element.focus();
         }
         if (el.setSelectionRange) {
-            var len = $el.val().length * 2;
+            var len = $element.val().length * 2;
             setTimeout(function() {
-                el.setSelectionRange(len, len);
+                element.setSelectionRange(len, len);
             }, 1);
         } else {
-            $el.val($el.val());
+            $element.val($element.val());
         }
         this.scrollTop = 999999;
     });
 };
+
+
 
 // EDIT PREVIOUS MESSAGE
 $(document).keydown(function(e) {
@@ -460,7 +499,6 @@ function signupAcc(){
 }
 
 function loginUser(){
-    console.log("DFSGSDFGSDFGSDFGSDFG")
     var uDetails = {
         userN: $('#loginUName').val(),
         userP: $('#loginPWord').val()
@@ -469,8 +507,8 @@ function loginUser(){
 }
 
 loginSocket.on('doLogin', function(uData){
-    collectUserData(uData.uName);
-    console.log('Lmao');
+    //collectUserData(uData.uName);
+    USERNAME = uData.username;
     submit(uData);
 });
 
@@ -480,35 +518,39 @@ function forgotPassword(email){
 
 function Search(){
     var username = jQuery('#search_user')[0].value;
-    var socket = io();
+    // var socket = io();
 
-    console.log("Hello");
-    socket.emit('listByUserName', username);
-    console.log("Goodbye");
+    var account_status = {
+        0: 'account_status_offline',
+        1: 'account_status_online',
+        2: 'account_status_away',
+        3: 'account_status_busy'
+    };
+
+    socket.emit('userSearch', username);
 
     socket.on('listResults', function(listResults) {
         $('#user_search_results').html('');
-
-        $.each(listResults, function (i, row) {
-            jQuery('#user_search_results').append(
-                jQuery('<div id="list_account" onClick="collectUserData(\'' + row.username + '\')" style="cursor: pointer;">').append(
-                    jQuery('<div id="account_img" class="account_status_offline">').css('background-image', 'url("'+row.picture+'")'),
-                    jQuery('<div id="account_user_names">').append(
-                        jQuery('<span id="account_display_name">').html(row.display_name),
-                        jQuery('<span id="account_user_name">').html('@'+row.username)
+        if(jQuery('#search_user')[0].value !== ''){
+            $.each(listResults, function (i, row) {
+                jQuery('#user_search_results').append(
+                    // jQuery('<div id="list_account" onClick="collectUserData(\'' + row.username + '\')" style="cursor: pointer;">').append(
+                    jQuery('<div id="list_account" onClick="connectToRoom("' + row.username + '")" style="cursor: pointer;">').append(
+                        //connectToRoom(" + row.username + ")
+                        jQuery('<div id="account_img" class="'+account_status[row.user_status]+'">').css('background-image', 'url("'+row.picture+'")'),
+                        jQuery('<div id="account_user_names">').append(
+                            jQuery('<span id="account_display_name">').html(row.display_name),
+                            jQuery('<span id="account_user_name">').html('@'+row.username)
+                        )
                     )
-                )
-            );
-            console.log(row);
-        });
+                );
+            });
+        }
     });
-
-    collectUserData(username);
 }
 
 var searchTimeout = null;
 function searchKeyUp(){
-    console.log('your nan');
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(function () {
         Search();
