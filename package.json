@@ -1,26 +1,21 @@
 {
-  "name": "PreCure Chat",
-  "version": "1.0",
-  "description": "PreCure Chat app - Socket.io",
+  "name": "precure",
+  "version": "0.1.0",
+  "description": "PreCure chat app",
   "dependencies": {
     "async": "^2.5.0",
-    "express": "^4.16.1",
+    "express": "^4.16.2",
     "finalhandler": "^1.1.0",
     "fresh": "^0.5.2",
     "js-sha256": "^0.6.0",
-    "mongodb": "^2.2.31",
-    "mongoose": "^4.11.13",
     "node-emoji": "^1.8.1",
     "nodejs": "0.0.0",
     "pg": "^7.3.0",
     "qs": "^6.5.1",
-    "send": "^0.15.6",
+    "send": "^0.16.1",
     "serve-static": "^1.13.1",
     "socket.io": "^2.0.3",
     "utils-merge": "^1.0.1",
-    "vary": "^1.1.2"
-  },
-  "scripts": {
-    "start": "nodemon server.js"
+    "very": "0.0.2"
   }
 }
