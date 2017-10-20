@@ -13,12 +13,13 @@ def background():
     print "DOWNLOADING NEW UPDATE"
     # Kill everything with the keyword 'server.js'
     os.system("pkill -9 server.js")
+    os.system("pkill -9 node")
 
-    os.chdir("/var/www/html")
+    os.chdir("/projects/PreCureChat")
 
     return_code = subprocess.call("sudo git pull origin master", shell=True)
 
-    subprocess.Popen(["node", "/var/www/html/server.js", "> out.log"])
+    subprocess.Popen(["npm", "start"])
 
     return 'up-to-date'
 
