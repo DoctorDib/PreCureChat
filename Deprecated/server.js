@@ -12,9 +12,9 @@ var fs = require('fs');
 
 var constants = require('constants');
 var options = {
-    key: fs.readFileSync('/etc/letsencrypt/archive/precure.ddns.net/privkey1.pem'),
-    cert: fs.readFileSync('/etc/letsencrypt/archive/precure.ddns.net/fullchain1.pem'),
-    ca: fs.readFileSync('/etc/letsencrypt/archive/precure.ddns.net/chain1.pem')
+    key: fs.readFileSync('SSL/privkey1.pem'),
+    cert: fs.readFileSync('SSL/fullchain1.pem'),
+    ca: fs.readFileSync('SSL/chain1.pem')
 };
 
 var https = require('https');
@@ -363,4 +363,4 @@ async function getOnlineUsers(){
     return res.rows
 }
 
-Server.listen(443, 'precure.ddns.net');
+Server.listen(8080, 'precure.ddns.net');
