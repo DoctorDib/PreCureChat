@@ -10,7 +10,7 @@
     "webpack": "^3.8.1"
   },
   "scripts": {
-    "start": "npm run build && serve -p 8080 -T -s build",
+    "start": "npm install && npm run build && serve -p 8080 -T -s build",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
