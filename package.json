@@ -1,21 +1,22 @@
 {
-  "name": "precure",
+  "name": "pre-cure",
   "version": "0.1.0",
-  "description": "PreCure chat app",
+  "private": true,
   "dependencies": {
-    "async": "^2.5.0",
-    "express": "^4.16.2",
-    "finalhandler": "^1.1.0",
-    "fresh": "^0.5.2",
-    "js-sha256": "^0.6.0",
-    "node-emoji": "^1.8.1",
-    "nodejs": "0.0.0",
-    "pg": "^7.3.0",
-    "qs": "^6.5.1",
-    "send": "^0.16.1",
-    "serve-static": "^1.13.1",
-    "socket.io": "^2.0.3",
-    "utils-merge": "^1.0.1",
-    "very": "0.0.2"
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-scripts": "1.0.14",
+    "webpack": "^3.8.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1"
   }
 }

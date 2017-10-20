@@ -1,0 +1,48 @@
+
+Running node-supervisor with
+  program 'server.js'
+  --watch '.'
+  --extensions 'node,js'
+  --exec 'node'
+
+Starting child process with 'node server.js'
+Watching directory '/var/www/html' for changes.
+Press rs for restarting the process.
+New Connection!
+/login#f7O085ulaNyEny9iAAAA
+New Connection!
+MidgetJake
+HFLGSLDKFLASDKFLSghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghDKFLKL
+[New Connection:   -  MidgetJake  -  ZnWCsGIrFnvbP9rjAAAB]
+1
+New Connection!
+/login#CYRYVaRplHG3UWfMAAAC
+New Connection!
+New Connection!
+sdfgsdflkjdhflkjghsldkfjghlkhsjdfhlgksjdflkgsjdhflkhjg
+James
+HFLGSLDKFLASDKFLSghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghDKFLKL
+[New Connection:   -  James  -  uJM2fawoFElhz4N9AAAE]
+sdfgsdflkjdhflkjghsldkfjghlkhsjdfhlgksjdflkgsjdhflkhjg
+2
+2
+2
+New Connection!
+/login#w8OW29z39X0c5goIAAAF
+New Connection!
+MidgetJake
+HFLGSLDKFLASDKFLSghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghDKFLKL
+[New Connection:   -  MidgetJake  -  qsao4buS8kXH4MojAAAG]
+1
+New Connection!
+/login#9BpHMZj5-Z07DhPRAAAH
+New Connection!
+MidgetJake
+HFLGSLDKFLASDKFLSghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghDKFLKL
+[New Connection:   -  MidgetJake  -  Yu49HeDChyPqKUujAAAI]
+New Connection!
+/login#u4EXs34ypVi_NlR5AAAJ
+New Connection!
+James
+HFLGSLDKFLASDKFLSghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghdfghDKFLKL
+[New Connection:   -  James  -  o-QldRWFZQyI1HbfAAAK]
