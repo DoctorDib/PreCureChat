@@ -1,0 +1,64 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font: 13px Helvetica, Arial; background: #000 url('../img/back-img.jpg') fixed bottom; background-size: cover; height:100vh; }
+
+/*******************/
+/* MAIN CONTAINERS */
+/*******************/
+#main-container{ width: 100%; height: 100%; overflow: hidden; display:flex; background: inherit; -webkit-box-shadow: 10px 10px 0px rgba(0,0,0,0.4); -moz-box-shadow: 10px 10px 0px rgba(0,0,0,0.4); box-shadow: 10px 10px 0px rgba(0,0,0,0.4); }
+#main-content{ width: 100%; right: 0; overflow-y: hidden; display: flex; flex-direction: column; background: rgba(0,0,0,0.5); flex-grow:1; }
+#right-menu{ display: flex; flex-direction: column; width:25%; border-left: 2px #fff solid; background: inherit; position: relative; overflow: hidden; }
+#right-menu:before{ content: ''; position: absolute; background: inherit; filter: blur(10px); height: 110%; width: 110%; left:-25px; top: -25px; box-shadow: inset 0 0 0 400px rgba(255,255,255,0.4);}
+
+/************/
+/* MESSAGES */
+/************/
+/* MESSAGE ANIMATION */
+@keyframes message-appear {
+    0% {max-width:0%; white-space: nowrap; }
+    100% {max-width: 75%; white-space: pre-line; }
+}
+
+/* CONTAINER*/
+#messages { overflow-y: auto; width: 100%; height: 100%; }
+#messages li {
+    box-shadow: 0px 4px 1px rgba(0, 0, 0, 0.1);
+    margin: 0.5em 0;
+    padding: 1em;
+    word-wrap: break-word;
+    clear: both;
+    vertical-align: middle;
+    max-width: 0%;
+    overflow: hidden;
+    animation-name: message-appear;
+    animation-duration: 0.3s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease-out;
+    list-style-type: none;
+    font-size: 1.5em;
+    display: flex;
+    flex-direction: column;
+}
+
+/**************/
+/* RIGHT MENU */
+/**************/
+
+/* MENU CONTROL */
+#menu-control{z-index: 1; display: flex; height: 50px;}
+#menu-control button{ border: none; width: 100%; cursor: pointer; }
+#menu-control button:hover{ background: #aaa; }
+
+/* FRIENDS LIST */
+#server-online form{ width: 15%; }
+#server-online { width: 100%; left: 0; color: #fff; overflow-y: auto; z-index: 1; }
+#num_of_people, #friendTags{ padding: 5px 0 0 10px; font-size: 2em; z-index: 3; color: white; top: 0; border-bottom: 1px rgba(0,0,0,0.4) solid; background-color: transparent; }
+#listed_people { display: flex; flex-direction: column; }
+#list_account { display: flex; padding: 10px; cursor: pointer; }
+#list_account:hover { background: rgba(0,0,0,0.3); }
+#account_user_name { font-size: 0.9em; color: #aaa; }
+
+/* USER SEARCH */
+#user-search{ width:100%; z-index: 1; color: #fff; overflow-y: auto; }
+#search_bar{ display: flex; justify-content: center; padding-top: 10px; padding-bottom: 10px; }
+#search_user{ border: none; width: 90%; font-size: 2em; padding: 5px; }

@@ -7,6 +7,8 @@
 var USERNAME = '';
 var DISPLAYNAME = '';
 var UID = '';
+
+var messageTick = 0;
 // var user = '';
 //======================================================================================================================
 // MESSAGE SETUP
@@ -18,7 +20,7 @@ var lastCacheMsg = '';
 // reTyep - will set when the user clicks up arrow.
 var reType = false;
 //======================================================================================================================
-// 
+//
 //======================================================================================================================
 var timeout;
 
@@ -44,7 +46,7 @@ var checkCookie = function (token){
             token: cookies[0].split('=')[1],
             expiry: cookies[1].split('=')[1]
         };
-        
+
         return cookies_obj;
     } catch(err){ return false; }
 };
@@ -131,6 +133,11 @@ function connectToRoom(roomName){
     currentRoom = roomName;
 }
 
+function createRoom(uName) {
+    socket.emit('createRoom', uName);
+    connectToRoom(uName);
+}
+
 //--------------------
 // ROOM OBJECT
 //--------------------
@@ -145,18 +152,21 @@ function Room(socket){
         2: 'account_status_away',
         3: 'account_status_busy'
     };
-    // -----------------------------------------------
+    // --------------------------------------------------------------------------
     // SEND MESSAGE TO SERVER - Sends current value in input box to the server.
-    // -----------------------------------------------
+    // --------------------------------------------------------------------------
     jQuery('#messageInput').submit(function(e){
-        if(this_.isLoggedIn) {
-            message = {edit: reType, user: USERNAME, classN: UID, msg: jQuery('#m').val()};
+        if(this_.isLoggedIn && reType === false) {
+            message = {edit: reType, user: USERNAME, classN: UID, msg: jQuery('#m').val(), msgID: messageTick+=1};
+            console.log(message)
             socket.emit('onMessage', message);
             timeoutFunction();
             lastCacheMsg = jQuery('#m').val();
             jQuery('#messages').scrollTop(jQuery('#messages')[0].scrollHeight);
             jQuery('#m').val('');
             return false;
+        } else {
+            console.log("OHSDFOGHOHOPE")
         }
     });
 
@@ -204,7 +214,9 @@ function Room(socket){
             var boolRetype = msg.edit;
             var userName = msg.user;
             var className = msg.classN;
+            console.log(className)
             var message = msg.msg;
+            var messageID = parseInt(msg.msgID);
 
             // When receiving message, it will check whether current chatroom is active.
             if (activeSession === false && !boolRetype) {
@@ -263,31 +275,37 @@ function Room(socket){
 
             // Nah it's just a normal one
             } else {
-                // Retyping the message either from sender or reciever.
-                if (boolRetype === true) {
-                    if (USERNAME === userName) {
-                        jQuery('#messages li#sender:last')[0].innerHTML = '<span>' + message + '</span>';
+                try {
+                    // Retyping the message either from sender or reciever.
+                    if (boolRetype === true) {
+                        if (USERNAME === userName) {
+                            jQuery('#messages li#sender span#' + messageID)[0].innerHTML = message;
+                        } else {
+                            jQuery('#messages li#reciever.' + className + ' span#' + messageID)[0].innerHTML = message;
+                        }
+                        reType = false;
                     } else {
-                        jQuery('#messages li#reciever.' + className + ':last div#messageTag')[0].innerHTML = '<span>' + message + '</span>';
+                        // Default message send.
+                        if (USERNAME === userName) {
+                            var msgBox = document.createElement('li');
+                            msgBox.id = 'sender';
+                            msgBox.className = className;
+                            msgBox.innerHTML = '<span id=' + messageID + '>' + message + '</span>';
+                            jQuery('#messages').append(msgBox);
+                        } else {
+                            var userTag = document.createElement('div');
+                            userTag.id = 'nameTag';
+                            userTag.innerHTML = userName.bold();
+                            var msgTag = document.createElement('div');
+                            msgTag.id = 'messageTag';
+                            msgTag.innerHTML = '<span id="' + messageID + '">' + message + '</span>';
+                            console.log(className)
+                            jQuery('#messages').append(
+                                $('<li id="reciever" class="' + className + '">').append(userTag).append(msgTag)
+                            );
+                        }
                     }
-                    reType = false;
-                } else {
-                    // Default message send.
-                    if (USERNAME === userName) {
-                        var msgBox = document.createElement('li');
-                        msgBox.id = 'sender';
-                        msgBox.className = className;
-                        msgBox.innerHTML = '<span>' + message + '</span>';
-                        jQuery('#messages').append(msgBox);
-                    } else {
-                        var userTag = document.createElement('div');
-                        userTag.id = 'nameTag';
-                        userTag.innerHTML = userName.bold();
-                        var msgTag = document.createElement('div');
-                        msgTag.id = 'messageTag';
-                        msgTag.innerHTML = '<span>' + message + '</span>';
-                        jQuery('#messages').append($('<li id="reciever" class="' + className + '">').append(userTag).append(msgTag));
-                    }
+                } catch(e){
                 }
             }
 
@@ -297,16 +315,16 @@ function Room(socket){
 
     // -----------------------------------------------
     // LIST ONLINE USERS - This function lists every active user in session to the left hand side.
-    // -----------------------------------------------
+    // -----------------------------------------------------------------------------------------------
     socket.on('people', function(onlineList){
         if(this_.isLoggedIn) {
             // Resets list
-            jQuery('#listedPeople').html('');
+            jQuery('#listed_people').html('');
 
             $.each(onlineList, function (i, row) {
-                jQuery('#listedPeople').append(
+                jQuery('#listed_people').append(
                     // jQuery('<div id="list_account" onClick="collectUserData(\'' + row.username + '\')" style="cursor: pointer;">').append(
-                    jQuery('<div id="list_account" onClick="" style="cursor: pointer;">').append(
+                    jQuery('<div id="list_account" onClick="">').append(
                         jQuery('<div id="account_img" class="' + account_status[row.user_status] + '">').css('background-image', 'url("' + row.picture + '")'),
                         jQuery('<div id="account_user_names">').append(
                             jQuery('<span id="account_display_name">').html(row.display_name),
@@ -316,6 +334,23 @@ function Room(socket){
                 )
             });
         }
+    });
+
+    try {
+        //REMOVES MESSAGE FROM EVERYONE
+        socket.on('removeMessageNOW', function(IDs){
+            jQuery('li#reciever.' + IDs.uID + ' span#' + IDs.msgID).parent().parent().remove();
+        });
+    } catch (e) {
+    }
+
+
+    //
+    // FRIENDS LIST - Creates friends list
+    //
+    socket.emit('getFriendList', USERNAME);
+    socket.on('sendFriendList',  function(friends){
+        console.log(friends)
     });
 
     // -----------------------------------------------
@@ -373,6 +408,8 @@ function submit(uData) {
     // Setup user variables
     USERNAME = uData.username;
     DISPLAYNAME = uData.uName;
+    UID = uData.uID;
+
     token = {
         token: uData.token,
         expiry: uData.tokenExpire
@@ -387,7 +424,7 @@ function submit(uData) {
     }, 100);
     loggedIn();
     //loggedIn = true;
-};
+}
 
 
 // Function taken from the net - Places your cursor at the end of the sentence.
@@ -535,7 +572,7 @@ function Search(){
             $.each(listResults, function (i, row) {
                 jQuery('#user_search_results').append(
                     // jQuery('<div id="list_account" onClick="collectUserData(\'' + row.username + '\')" style="cursor: pointer;">').append(
-                    jQuery('<div id="list_account" onClick="connectToRoom("' + row.username + '")" style="cursor: pointer;">').append(
+                    jQuery('<div id="list_account" onClick="createRoom("' + row.username + '")" style="cursor: pointer;">').append(
                         //connectToRoom(" + row.username + ")
                         jQuery('<div id="account_img" class="'+account_status[row.user_status]+'">').css('background-image', 'url("'+row.picture+'")'),
                         jQuery('<div id="account_user_names">').append(
@@ -556,4 +593,163 @@ function searchKeyUp(){
         Search();
         }
     , 500);
+}
+
+
+
+//=================================================================================
+// SET UP - Setting up functions
+//=================================================================================
+var COPY  = function(element){
+    var $temp = $("<input>");
+    $("body").append($temp);
+    $temp.val(element.textContent).select();
+    document.execCommand("copy");
+    $temp.remove();
+    tiggerTrigger = false;
+};
+
+var EDIT =  function(element){
+    var idMsg = parseInt(jQuery(element.childNodes[0]).attr('id'));
+    jQuery('#m').value = element.childNodes[0].textContent;
+    reType = true;
+    jQuery(document).on('click', '#desktop-send', function (e) {
+        message = {edit: true, user: USERNAME, classN: UID, msg: jQuery('#m').val(), msgID: idMsg};
+        socket.emit('onMessage', message);
+        e.preventDefault();
+        jQuery('#m')[0].value = '';
+        jQuery(document).off('click', '#desktop-send');
+        reType = false;
+        tiggerTrigger = false;
+    });
+    $(document).off('click', '#editMessage')
+};
+
+var REMOVE = function(element){
+    var idMsg = parseInt(jQuery(element.childNodes[0]).attr('id'));
+    jQuery('li#sender span#' + idMsg).parent().remove();
+    var msgEditIDs = {uID: UID, msgID: idMsg};
+    socket.emit('removeMessage', msgEditIDs);
+    tiggerTrigger = false;
+};
+
+// RIGHT CLICK
+$(document).ready(function() {
+    //=================================================================================
+    // RUNNING WITH THE RIGHT CLICK - This is where the magic stuff happen
+    //=================================================================================
+
+    if ($("#sender").addEventListener) {
+        $("#sender").addEventListener('contextmenu', function(e) {
+            alert("You've tried to open context menu"); //here you draw your own menu
+            e.preventDefault();
+        }, false);
+    } else {
+
+        var lastClickedCache = null;
+        //document.getElementById("test").attachEvent('oncontextmenu', function() {
+        //$(".test").bind('contextmenu', function() {
+        $('body').on('contextmenu', '#sender', function(e) {
+            var element = this;
+
+            console.log("RIGHT CLICKED");
+            // COPY MESSAGE - Removing event listener
+            var oldCopyEl = document.getElementById("copyMessage");
+            var newCopyEl = oldCopyEl.cloneNode(true);
+            oldCopyEl.parentNode.replaceChild(newCopyEl, oldCopyEl);
+
+            // EDIT MESSAGE - Removing event listener
+            var oldEditEl = document.getElementById("editMessage");
+            var newEditEl = oldEditEl.cloneNode(true);
+            oldEditEl.parentNode.replaceChild(newEditEl, oldEditEl);
+
+            // REMOVE MESSAGE - Removing event listener
+            var oldRemoveEl = document.getElementById("removeMessage");
+            var newRemoveEl = oldRemoveEl.cloneNode(true);
+            oldRemoveEl.parentNode.replaceChild(newRemoveEl, oldRemoveEl);
+
+
+            console.log("HWELLELELEELEO");
+            console.log(element);
+
+
+
+
+
+            //alert("contextmenu"+event);
+            document.getElementById("senderMenu").className = "show";
+            document.getElementById("senderMenu").style.top = mouseY(event) + 'px';
+            document.getElementById("senderMenu").style.left = mouseX(event) + 'px';
+
+            // COPY MESSAGE
+            document.getElementById("copyMessage").addEventListener("click", function(){COPY(element)}, false);
+
+            // EDIT MESSAGE
+            document.getElementById('editMessage').addEventListener('click', function(){EDIT(element)}, false);
+
+            // REMOVE MESSAGE
+            document.getElementById("removeMessage").addEventListener("click", function(){REMOVE(element)}, false);
+            window.event.returnValue = false;
+            e.preventDefault();
+
+        });
+    }
+
+    if ($("#list_account").addEventListener) {
+        $("#list_account").addEventListener('contextmenu', function(e) {
+            alert("You've tried to open context menu"); //here you draw your own menu
+            e.preventDefault();
+        }, false);
+    } else {
+
+        //document.getElementById("test").attachEvent('oncontextmenu', function() {
+        //$(".test").bind('contextmenu', function() {
+        $('body').on('contextmenu', '#list_account', function() {
+
+
+            //alert("contextmenu"+event);
+            document.getElementById("peopleMenu").className = "show";
+            document.getElementById("peopleMenu").style.top =  mouseY(event) + 'px';
+            document.getElementById("peopleMenu").style.left = mouseX(event) + 'px';
+
+            window.event.returnValue = false;
+
+
+        });
+
+    }
+
+
+});
+
+// this is from another SO post...
+$(document).bind("click", function(event) {
+    document.getElementById("senderMenu").className = "hide";
+    document.getElementById("peopleMenu").className = "hide";
+});
+
+
+
+function mouseX(evt) {
+    if (evt.pageX) {
+        return evt.pageX;
+    } else if (evt.clientX) {
+       return evt.clientX + (document.documentElement.scrollLeft ?
+           document.documentElement.scrollLeft :
+           document.body.scrollLeft);
+    } else {
+        return null;
+    }
+}
+
+function mouseY(evt) {
+    if (evt.pageY) {
+        return evt.pageY;
+    } else if (evt.clientY) {
+       return evt.clientY + (document.documentElement.scrollTop ?
+       document.documentElement.scrollTop :
+       document.body.scrollTop);
+    } else {
+        return null;
+    }
 }

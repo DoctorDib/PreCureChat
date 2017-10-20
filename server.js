@@ -77,7 +77,7 @@ function generateToken(uName, dName){
 }
 
 /*var d = new Date();
-document.getElementById("demo").innerHTML = d.getTime();*/
+ document.getElementById("demo").innerHTML = d.getTime();*/
 
 function getDateTime(increase) {
 
@@ -276,6 +276,12 @@ function Room(roomName){
             room.emit('typing', booleanType);
         });
 
+        // Removes message when right clicked/remove.
+        socket.on('removeMessage', function(IDs){
+            console.log(IDs)
+            room.emit('removeMessageNOW', IDs);
+        });
+
         // Calls when a user logs
         socket.on('login', async function(username){
             socket.username = username;
@@ -285,11 +291,11 @@ function Room(roomName){
         });
 
         // Called when a user disconnects
-        socket.on('disconnect', async function(socket){
-            console.log('disconnect');
-            console.log(socketCache.username);
-            room.emit('people', await getOnlineUsers());
-        });
+        // socket.on('disconnect', async function(socket){
+        //     console.log('disconnect');
+        //     console.log(socketCache.username);
+        //     room.emit('people', await getOnlineUsers());
+        // });
 
         // Update user list
         async function updateList(){
@@ -312,10 +318,42 @@ app.get('/', function(req, res){
 });
 
 io.on('connection', function(socket){
+
     // Calls when a user logs
     socket.on('leaveRoom', function(oldRoom, newRoom){
         socket.join('/' + newRoom);
         socket.leave('/' + oldRoom);
+    });
+
+    socket.on('getFriendList', async function(username){
+        try{
+            const queryText = "SELECT friends FROM user_collection WHERE username = $1";
+            const values = [username];
+            const res = await pool.query(queryText, values);
+            console.log(usernmae)
+            console.log(res.rows)
+            socket.emit('sendFriendList', res.rows);
+        } catch(e){ console.log(e)
+        }
+    });
+
+    // Calls when a user logs
+    socket.on('login', async function(username){
+        socket.username = username;
+        room.emit('people', await getOnlineUsers());
+        console.log(username + ' has logged into to: ' + roomName);
+        console.log("[New Connection: " + "  -  " + username + "  -  " + socket.id + ']');
+    });
+
+    // Called when a user disconnects
+    socket.on('disconnect', async function(socket){
+        console.log(this.username + ' disconnect');
+
+        const queryText = "UPDATE user_collection SET user_status = $1 WHERE username=$2";
+        const values = [0, this.username];
+        const res = await pool.query(queryText, values);
+
+        socket.emit('people', await getOnlineUsers());
     });
 });
 

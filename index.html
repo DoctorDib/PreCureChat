@@ -4,6 +4,7 @@
 
         <title>Precure chat</title>
         <link rel="stylesheet" type="text/css" href="/css/style.css">
+        <link rel="stylesheet" type="text/css" href="/css/main.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
@@ -89,15 +90,8 @@
             <!--<div id='user_search_results'></div>-->
         </div>
 
-        <div id="mainChat" class="mainChat">
-            <section id='left'>
-                <button onclick='connectToRoom("test")'>Join Test</button>
-                <button onclick='connectToRoom("testicles")'>Join Testicles</button>
-                <p id='numofPeople'>Online:</p>
-                <ul id="listedPeople"></ul>
-            </section>
-
-            <section id='center'>
+        <div id="main-container">
+            <section id='main-content'>
                 <ul id="messages" class="custom-scroll"></ul>
                 <form action="" id="messageInput">
                     <p class="typing"> </p>
@@ -106,13 +100,46 @@
                     <button id="mobile-send">></button>
                 </form>
             </section>
-            <section id="right">
-                <div id="search_bar">
-                    <input id='search_user' onkeyup="searchKeyUp()"/>
-                    <!--<button onClick='Search()' style='height: 100px; width: 200px;'> SEARCH HERE </button>-->
-                </div>
-                <div id='user_search_results'></div>
+
+            <section id="right-menu">
+                <section id="menu-control">
+                    <button onclick='connectToRoom("test")'>Join Test</button>
+                    <button onclick='connectToRoom("testicles")'>Join Testicles</button>
+                </section>
+
+                <section id="server-online">
+                    <p id='num_of_people'>Online:</p>
+                    <ul id="listed_people"></ul>
+                </section>
+
+                <section id="user-search">
+                    <div id="search_bar">
+                        <input id='search_user' onkeyup="searchKeyUp()"/>
+                        <!--<button onClick='Search()' style='height: 100px; width: 200px;'> SEARCH HERE </button>-->
+                    </div>
+                    <div id='user_search_results'></div>
+
+                    <p> Friends online </p>
+                    <ul id="onlineFriends"></ul>
+                    <p> Friends offline </p>
+                    <ul id="offlineFriends"></ul>
+                </section>
             </section>
+        </div>
+
+
+        <!-- SENDER RIGHT CLICK MENU -->
+        <div class="hide" id="senderMenu">
+            <p id='copyMessage'> COPY </p>
+            <p id ='editMessage'> EDIT MESSAGE </p>
+            <p id ='removeMessage'> REMOVE MESSAGE </p>
+            <p id='pinMessage'> PIN MESSAGE </p>
+        </div>
+
+        <!-- LIST PEOPLE RIGHT CLICK MENU -->
+        <div class="hide" id="peopleMenu">
+            <p> ADD FRIEND </p>
+            <p> BLOCK FRIEND </p>
         </div>
 
     </body>

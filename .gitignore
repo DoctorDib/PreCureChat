@@ -62,4 +62,7 @@ typings/
 .env
 
 .idea/
+.floo
+.flooignore
+.ftpconfig
 
