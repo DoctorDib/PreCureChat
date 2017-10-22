@@ -15,3 +15,7 @@ io.on('connection', function (socket) {
     });
 	
 });
+
+http.listen(8080, function () {
+    console.log('Launched on port 8080');
+});

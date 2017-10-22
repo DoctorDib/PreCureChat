@@ -9,7 +9,10 @@ from sys import executable
 
 app = Flask(__name__)
 
+github_action = threading.Thread(name='background', target=background)
+
 def background():
+	github_action.start()
     print "======================================================================="
     print "DOWNLOADING NEW UPDATE"
     print "======================================================================="
@@ -40,12 +43,13 @@ def foo():
     print data
     #print "New commit by: {}".format(data['commits'][0]['author']['name'])
     print "======================================================================="
-
+	github_action.terminate()
     return background()
 
 
 def mainSetup():
-    subprocess.call("npm start", shell=True)
+	github_action.start()
+	
     print "======================================================================="
     print "GITHUB_UPDATER - LAUNCHED"
     print "======================================================================="
