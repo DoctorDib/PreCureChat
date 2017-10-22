@@ -15,18 +15,18 @@ def background():
     print "======================================================================="
 	
     # Kill everything with the keyword 'server.js'
-    os.system("pkill -9 node")
+    subprocess.call("pkill -9 node", shell=True)
 
     os.chdir("/projects/PreCureChat")
 	
     # Pulls latest files of GitHub
-    return_code = subprocess.call("git pull origin master", shell=True)
+    subprocess.call("git pull origin master", shell=True)
 	
     # Launches new code.
     print "======================================================================="
     print "GITHUB_UPDATER - UPDATE SUCCESSFUL"
     print "======================================================================="
-    os.system("npm start")
+    subprocess.call("npm start", shell=True)
 
     # Returns a code
     return 'Successful'
@@ -45,7 +45,7 @@ def foo():
 
 
 def mainSetup():
-    os.system("npm start")
+    subprocess.call("npm start", shell=True)
     print "======================================================================="
     print "GITHUB_UPDATER - LAUNCHED"
     print "======================================================================="
