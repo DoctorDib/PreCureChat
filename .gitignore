@@ -4,6 +4,9 @@
 /node_modules
 package-lock.json
 
+# debugger
+out.log
+
 # testing
 /coverage
 
