@@ -8,13 +8,29 @@
 		<script src="http://fb.me/react-0.13.1.js"></script>
 		<script src="http://fb.me/JSXTransformer-0.13.1.js"></script>
 		
-		<script src="/socket.io/socket.io.js"></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 		
 		<script type="text/jsx" src="js/main.js"></script>
 	</head>
 
 	<body>
 		<div class="container" id="main"></div>
+		
+		<!-- SENDER RIGHT CLICK MENU -->
+        <div class="hide" id="senderMenu">
+            <p id='copyMessage'> COPY </p>
+            <p id ='editMessage'> EDIT MESSAGE </p>
+            <p id ='removeMessage'> REMOVE MESSAGE </p>
+            <p id='pinMessage'> PIN MESSAGE </p>
+        </div>
+
+        <!-- LIST PEOPLE RIGHT CLICK MENU -->
+        <div class="hide" id="peopleMenu">
+            <p> ADD FRIEND </p>
+            <p> BLOCK FRIEND </p>
+        </div>
 	</body>
 
 </html>
