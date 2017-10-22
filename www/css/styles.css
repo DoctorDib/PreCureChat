@@ -1,4 +1,247 @@
-body {
-	background-color: lime;
-	color: #ffff00;
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font: 13px Helvetica, Arial; background: #000 url('../img/backgroundImg2.png') repeat bottom; background-size: 30%; }
+form { position: relative; bottom: 0; width: 100%; border: 0; background: #ccc;  padding: 10px;  display: flex; }
+form input { width: 90%; font-size: 2em; border: 0; padding: 0.2em; background-color: #dbdbdb; border-radius: 0.1em; }
+form button { width: 10%; background: #cbcbcb; font-size: 2em; border: 0; cursor: pointer; margin-left: 10px; border-radius: 0.1em; -webkit-transition: all 1s ease-out; -moz-transition: all 1s ease-out; -o-transition: all 1s ease-out; transition: all 1s ease-out; }
+form button:hover { background: #a9a9a9;  box-shadow: inset 1px 2px 4px #555; }
+
+#mainChat{ width: 80%; height: 97%; left: 50%; top: 50%; position: absolute; transform: translate(-50%, -50%); overflow: hidden; border-radius: 0.5em;
+    -webkit-box-shadow: 10px 10px 0px rgba(0,0,0,0.4); -moz-box-shadow: 10px 10px 0px rgba(0,0,0,0.4); box-shadow: 10px 10px 0px rgba(0,0,0,0.4); }
+
+#mobile-send{ display: none; background: #aaa; color: #fff; }
+
+#friend-list form{ width: 15%; }
+#friend-left { width: 20%; left: 0; color: #fff; overflow-y: auto; z-index: 1; background: #212121 url(../img/backgroundImg14.png) repeat bottom; background-size: 90%;
+    -webkit-box-shadow: inset -5px 0px 5px rgba(0,0,0,0.4); -moz-box-shadow: inset -5px 0px 5px rgba(0,0,0,0.4); box-shadow: inset -5px 0px 5px rgba(0,0,0,0.4); }
+#center{ width: 60%; right: 0; overflow-y: hidden; display: flex; flex-direction: column; background: #dddddd url(../img/backgroundImg7.png) repeat bottom; background-size: 20%; }
+
+#listedPeople{ display:flex; flex-direction: column; }
+
+
+
+/* MESSAGES */
+#messages { overflow-y: auto; width: 100%; height: 100%; }
+#messages li {
+    box-shadow: 0px 4px 1px rgba(0, 0, 0, 0.1);
+    margin: 0.5em 0;
+    padding: 1em;
+    word-wrap: break-word;
+    clear: both;
+    vertical-align: middle;
+    max-width: 0%;
+    overflow: hidden;
+    animation-name: message-appear;
+    animation-duration: 0.3s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease-out;
+    list-style-type: none;
+    font-size: 1.5em;
+    display: flex;
+    flex-direction: column;
+}
+
+/* MESSAGE EMBEDS */
+img{ max-width: 100%; }
+#senderImg{ color: black; float: right; clear: both; max-width: 100%; min-width: 5em; cursor:pointer; background: #5a5; padding: 0.15em; border-radius: 0.5em 0 0 0.5em; }
+#recieverImg{ text-align:left; float: left; clear: both; max-width: 100%; min-width: 5em; cursor:pointer; background: #ddd; padding: 0.15em; border-radius: 0 0.5em 0.5em 0; }
+#senderYT{ float: right; height: 300px; width: 500px; background: #5a5; padding: 0.3em; border-radius: 0.5em 0 0 0.5em; }
+#senderYT frame { width:100%; height: 100%; }
+#recieverYT{ float: left; height: 300px; width: 500px; background: #ddd; padding: 0.3em;  border-radius: 0 0.5em 0.5em 0; }
+#recieverYT frame { width:100%; height: 100%; }
+
+#nameTag { border-bottom: 1px rgba(0,0,0,0.5) solid; width: 100%; }
+#sender{ background-color: #5a5; color: #fff; float: right; clear: both; border-radius: 0.5em 0 0 0.5em; }
+#reciever{ text-align: left; background-color: #ddd; color: #222; float: left; clear: both; border-radius: 0 0.5em 0.5em 0; }
+#connectionMsg{ text-align: center; background-color: #ddd; color: #222; clear: both; border-radius: 0.5em; margin: 0.5em auto; }
+
+#leftAccount {
+    height: 100%;
+    width: 50%;
+    left: 0;
+    color: #fff;
+    overflow-y: auto;
+    -webkit-box-shadow: -5px 0px 8px 8px rgba(0,0,0,1);
+    -moz-box-shadow: -5px 0px 8px 8px rgba(0,0,0,1);
+    box-shadow: -5px 0px 10px 6px rgba(0,0,0,1);
+    z-index: 1;
+    background: #183e5a;
+    position: fixed;
+}
+#rightAccount{ height: 100%; width: 50%; right: 0; overflow-y: hidden; display: flex; flex-direction: column; background: #dddddd; position: fixed; }
+
+#friends {
+    margin-top: 2em;
+    margin-left: auto;
+    margin-right: auto;
+    min-width: 25%;
+    max-width: 75%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+.onlineFriend { margin-top: 3em; display: inline-block; }
+.profilePics { border-radius: 50%; width: 100px; height: 100px; display: block; float: left; border: 0.2em solid #8a0000; }
+.profileNames { float: left; font-size: 2em; margin-top: 5%; margin-left: 1em; }
+.online{ border: 0.3em solid #1db300; }
+
+#launcher { position: fixed; width: 100%; height: 100%; z-index: 2; display: block; background: #484 url('../img/backgroundImg.png') repeat bottom; }
+#register, #forgotPass{
+    position: absolute;
+    width: 30%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+    background: #222;
+    border: 5px #fff solid;
+    border-radius: 0.5em;
+    padding: 60px 20px;
+}
+.register, .forgotPass, .accountPage-close, .mainChat, .leftAccount-close{
+    display: none;
+    z-index: 0;
+}
+.register-open, .forgotPass-open, .mainChat-open, .accountPage{ display: flex; }
+#register input, #forgotPass input{ margin-top: 2px; margin-bottom: 15px; width: 100%; font-size: 3.5em; }
+#register label, #forgotPass label{ color:#fff; font-size: 1.5em; }
+#register-btn, #forgotPass-btn { display: block; border: none; width: 30%; right: 0; height: 3.5em; margin-top: 15px; cursor: pointer; }
+#login {
+    position: absolute;
+    display: flex;
+    width: 30%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+    background: rgba(0,0,0,0.5);
+    padding: 90px 30px 30px 30px;
+    border-radius: 0.5em;
+}
+
+.btn-close{
+    background: #444;
+    border: none;
+    cursor: pointer;
+    height: 50px;
+    width: 50px;
+    top: 0;
+    right: 0;
+    position: absolute;
+    font-size: 3em;
+    color: #fff;
+    z-index: 5;
+}
+
+#login input{ margin-top: 15px; width: 100%; font-size: 3.5em; border: none; padding: 5px; }
+#login button { display: block; border: none; width: 30%; float: left; margin-top: 60px; cursor: pointer; font-weight: bold; font-size: 2em; padding: 5px; }
+#loginButtons{ width: 100%; }
+
+#launcherInput{ font-size: 3.5em; text-align: center; border: 0; }
+#launcherButton{ text-align: center; background-color: #7f7b7b; border: 0; }
+#launcherTitle{ position:fixed; left:50%; transform: translate(-50%); font-size: 10em; color: white; }
+
+#numofPeople{
+    padding: 5px 0 0 10px;
+    font-size: 2em;
+    z-index: 3;
+    color: white;
+    top: 0;
+    border-bottom: 1px rgba(0,0,0,0.4) solid;
+    background-color: #191919;
+}
+
+.Remove{ font-size: 2em; padding: 0.2em 0.75em; width: 100%; word-wrap: break-word; }
+.typing{ font-size: 1.5em; padding: 0.5em; color: black; z-index: 6; position: absolute; height: 1em; top: -2em; }
+
+/* ACCOUNT PAGE */
+#account_page {
+    z-index: 100;
+    position: fixed;
+    width: 30%;
+    height: 80%;
+    border: 3px #222 solid;
+    background: #444;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-box-shadow: 10px 10px 0px rgba(0,0,0,0.4);
+    -moz-box-shadow: 10px 10px 0px rgba(0,0,0,0.4);
+    box-shadow: 10px 10px 0px rgba(0,0,0,0.4);
+    border-radius: 1em;
+    overflow: hidden;
+    color: #fff;
+    flex-direction: column;
+}
+.account_page { display: none; }
+.account_page_open { display: flex; }
+#profile_banner {
+    background-size: cover;
+    background-clip: content-box;
+    background: url("../UserData/banner/default_banner.jpg") scroll center;
+    width: 100%;
+    height: 250px;
+    z-index: -1;
+    -webkit-box-shadow: 0px 4px 0px rgba(0,0,0,0.4);
+    -moz-box-shadow: 0px 4px 0px rgba(0,0,0,0.4);
+    box-shadow: 0px 4px 0px rgba(0,0,0,0.4);
+}
+#profile_content { display: flex; flex-direction: column; align-content: center; height: 100%; }
+#profile_img_container{ position: absolute; width: 100%; transform: translate(0, -50%); }
+#profile_img{ border-radius: 50%; width: 150px; height: 150px; display: block; margin:auto; background: url(../UserData/img/default_pic.jpg) center; background-size: cover; }
+
+.account_status_online { border: 0.2em solid #3f3; }
+.account_status_offline { border: 0.2em solid #333; }
+.account_status_busy { border: 0.2em solid #f33; }
+.account_status_away { border: 0.2em solid #ffff33; }
+
+#profile_status{ text-align: right; padding: 10px 110px 10px 0; }
+#profile_display_name{ padding: 25px 25px 0 25px; text-align: center; font-size: 3em; }
+#profile_name{ text-align: center; color: #888; font-size: 1.3em; }
+#profile_bio{ height: 100%; padding: 25px; }
+/*#list_account{ display: flex; padding: 10px; background-color: rgba(56, 56, 56, 0.71); }*/
+#account_img{ height: 40px; width: 40px; background-size: cover; background-position: center; border-radius: 5em; }
+#account_user_names{ padding-left: 10px; display: flex; flex-direction: column; }
+#account_display_name{ font-size: 1.5em; font-weight: bold; }
+#account_user_name{ font-size: 0.9em; color: #777; }
+
+.custom-scroll::-webkit-scrollbar-track{ -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); background-color: #F5F5F5; }
+.custom-scroll::-webkit-scrollbar{ width: 12px; background-color: #F5F5F5; }
+.custom-scroll::-webkit-scrollbar-thumb{ -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3); background-color: #555; }
+
+.show {
+    z-index:1000;
+    position: absolute;
+    background-color:#C0C0C0;
+    border: 1px solid black;
+    padding: 2px;
+    display: block;
+    margin: 0;
+    list-style-type: none;
+    list-style: none;
+}
+.hide { display: none; }
+.show p { border: 0 !important; text-decoration: none; font-size: 1.5em; }
+.show p:hover { cursor: pointer; background-color: lime; }
+
+@media only screen and (max-width: 1000px) {
+    #right{ width: 100%; }
+    #left{ width: 0; -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none; }
+    #left form{ display: none; }
+    li{ font-size: 1.7em; }
+}
+
+@media only screen and (max-width: 600px){
+    #login{ width: 100%; left: 0; transform: translate(0, -50%); }
+    #mobile-send{ display:block; }
+    #desktop-send { display:none; }
+    form input{ font-size: unset; }
+    #right{ background: #dddddd url(../img/backgroundImg4.png) repeat bottom; background-size: 100%; }
+    .custom-scroll::-webkit-scrollbar-track{ -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); background-color: #F5F5F5; }
+    .custom-scroll::-webkit-scrollbar{ width: 6px; background-color: #F5F5F5; }
+    .custom-scroll::-webkit-scrollbar-thumb{ -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3); background-color: #555; }
+}
+
+@media (max-width: 500px) {
+    #messages li { font-size: 1em; }
 }
