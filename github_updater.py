@@ -15,12 +15,12 @@ def background():
     print "======================================================================="
 	
     # Kill everything with the keyword 'server.js'
-    os.system("sudo pkill -9 node")
+    os.system("pkill -9 node")
 
     os.chdir("/projects/PreCureChat")
 	
     # Pulls latest files of GitHub
-    return_code = subprocess.call("sudo git pull origin master", shell=True)
+    return_code = subprocess.call("git pull origin master", shell=True)
 	
     # Launches new code.
     print "======================================================================="
