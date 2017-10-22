@@ -1,23 +1,15 @@
 {
-  "name": "pre-cure",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0",
-    "react-scripts": "1.0.14",
-    "serve": "^6.3.1",
-    "webpack": "^3.8.1"
-  },
+  "name": "PreCure",
+  "version": "0.2.0",
+  "description": "PreCure Chat App",
+  "main": "server.js",
   "scripts": {
-    "start": "npm install && npm run build && serve -p 8080 -T -s build",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-react": "^6.24.1"
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "express": "^4.12.3",
+    "socket.io": "^1.3.5"
   }
 }
