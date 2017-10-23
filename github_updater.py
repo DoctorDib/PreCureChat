@@ -9,42 +9,62 @@ from sys import executable
 
 app = Flask(__name__)
 
-def background():
-    print "======================================================================="
-    print "DOWNLOADING NEW UPDATE"
-    print "======================================================================="
-	
-    # Kill everything with the keyword 'server.js'
-    subprocess.call("pkill -9 node", shell=True)
+users=['DoctorDib', 'MidgetJake']
 
-    os.chdir("/projects/PreCureChat")
-	
-    # Pulls latest files of GitHub
-    subprocess.call("git pull origin master", shell=True)
-	
-    # Launches new code.
-    print "======================================================================="
-    print "GITHUB_UPDATER - UPDATE SUCCESSFUL"
-    print "======================================================================="
-    subprocess.call("npm start", shell=True)
+def update_server(name):
+    # Checks commited username pull.
+    if name in str(users):
+        print "======================================================================="
+        print "DOWNLOADING NEW UPDATE"
+        print "======================================================================="
 
-    # Returns a code
-    return 'Successful'
+        # Kill everything with the keyword 'server.js'
+        subprocess.call("pkill -9 node", shell=True)
+
+        os.chdir("/projects/PreCureChat")
+
+        # Pulls latest files of GitHub
+        subprocess.call("git pull origin master", shell=True)
+
+        # Launches new code.
+        print "======================================================================="
+        print "GITHUB_UPDATER - UPDATE SUCCESSFUL"
+        print "======================================================================="
+        subprocess.Popen("node", "server.js", ">", "out.log", "&", "disown")
+
+        # Returns a code
+        return 'Successful'
+    else:
+        return 'User authentication denied'
 
 @app.route('/',methods=['POST'])
 def foo():
     print "======================================================================="
     print "NOTICE - LOG"
     print "======================================================================="
-    data = json.loads(request.data)
-    print data
-    #print "New commit by: {}".format(data['commits'][0]['author']['name'])
-    print "======================================================================="
-    return background()
 
+    data = json.loads(request.data)
+
+    print "Name: {}".format(data['commits'][0]['author']['name'])
+    print "Username: {}".format(data['commits'][0]['author']['username'])
+    print "Email: {}".format(data['commits'][0]['author']['email'])
+    print "-------------------------------------------------------------"
+    print "URL: {}".format(data['commits'][0]['url'])
+    print "Message: {}".format(data['commits'][0]['message'])
+    print "Date/Time: {}".format(data['commits'][0]['timestamp'])
+    print "-------------------------------------------------------------"
+    print "Added: {}".format(data['commits'][0]['added'])
+    print "-------------------------------------------------------------"
+    print "Removed: {}".format(data['commits'][0]['removed'])
+    print "-------------------------------------------------------------"
+    print "Modified: {}".format(data['commits'][0]['modified'])
+
+    name = data['commits'][0]['author']['username']
+
+    return update_server(name)
 
 def mainSetup():
-
+    update_server()
     print "======================================================================="
     print "GITHUB_UPDATER - LAUNCHED"
     print "======================================================================="
