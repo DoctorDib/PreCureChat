@@ -46,19 +46,19 @@ var Chat = React.createClass({
 });
 
 //======================================================================================================================
-// Launcher page 
+// Launcher page
 //======================================================================================================================
 var Launcher = React.createClass({
 	render: function(){
 		return (
 			<section id='launcher'>
 
-			<h1 id='launcherTitle'> PreCure </h1>
+			    <h1 id='launcherTitle'> PreCure </h1>
 
-			{/*<div id="redundantLogin">
-					<input id='launcherInput'> </input>
-					<button onclick='submit()' id='launcherButton'> Enter Room </button>
-			</div>*/}
+    			{/*<div id="redundantLogin">
+    					<input id='launcherInput'> </input>
+    					<button onclick='submit()' id='launcherButton'> Enter Room </button>
+    			</div>*/}
 
 			</section>
 		);
@@ -66,61 +66,76 @@ var Launcher = React.createClass({
 })
 
 //======================================================================================================================
-// Register page 
+// Register page
 //======================================================================================================================
 var Register = React.createClass({
 	render: function(){
 		return (
-			<div id="register" class="register">
-				<button onclick='toggleRegister()' class="btn-close">X</button>
-				<div id="regError"></div>
-				<label for="regUName">Username</label>
-				<input name="Username" id="regUName"/>
-				<label for="regDName">Display Name</label>
-				<input name="DisplayName" id="regDName"/>
-				<label for="regEmail">Email</label>
-				<input name="Email" id="regEmail"/>
-				<label for="regPWord">Password</label>
-				<input name="Password" type="password" id="regPWord"/>
-				<label for="regPWordC">Confirm Password</label>
-				<input name="Password" type="password" id="regPWordC"/>
-				<button onclick='signupAcc()' id="register-btn">Register</button>
-			</div>
+            <section id='launcher'>
+
+			    <h1 id='launcherTitle'> PreCure </h1>
+
+                <div id="register" class="register">
+    				<button onclick='toggleRegister()' class="btn-close">X</button>
+    				<div id="regError"></div>
+    				<label for="regUName">Username</label>
+    				<input name="Username" id="regUName"/>
+    				<label for="regDName">Display Name</label>
+    				<input name="DisplayName" id="regDName"/>
+    				<label for="regEmail">Email</label>
+    				<input name="Email" id="regEmail"/>
+    				<label for="regPWord">Password</label>
+    				<input name="Password" type="password" id="regPWord"/>
+    				<label for="regPWordC">Confirm Password</label>
+    				<input name="Password" type="password" id="regPWordC"/>
+    				<button onclick='signupAcc()' id="register-btn">Register</button>
+    			</div>
+            </section>
 		);
 	}
 })
 
 //======================================================================================================================
-// Forgot Password page 
+// Forgot Password page
 //======================================================================================================================
 var ForgotPassword = React.createClass({
 	render: function(){
 		return (
-			<div id="forgotPass" class="forgotPass">
-				<button onclick='toggleForgotPass()' class="btn-close">X</button>
-				<label for="regEmail">Email</label>
-				<input name="Email" id="fpEmail"/>
-				<button onclick='forgotPassword()' id="forgotPass-btn">Send email</button>
-			</div>
+            <section id='launcher'>
+
+			    <h1 id='launcherTitle'> PreCure </h1>
+
+    			<div id="forgotPass" class="forgotPass">
+    				<button onclick='toggleForgotPass()' class="btn-close">X</button>
+    				<label for="regEmail">Email</label>
+    				<input name="Email" id="fpEmail"/>
+    				<button onclick='forgotPassword()' id="forgotPass-btn">Send email</button>
+    			</div>
+            </section>
 		);
 	}
 })
 
 //======================================================================================================================
-//Login page 
+//Login page
 //======================================================================================================================
 var Login = React.createClass({
 	render: function(){
 		return (
-			<div id="login">
-				<input title="Username" id="loginUName"/>
-				<input title="Password" type="password" id="loginPWord"/>
-				<div id="loginButtons">
-					<button onclick='loginUser()' styles="float: right;">Login</button>
-					<button onclick='toggleRegister()'>Register</button>
-				</div>
-				<a onclick='toggleForgotPass()' styles='cursor:pointer; display: none'> FORGOT PASSWORD OMGOMGOMG </a>
-			</div>
+            <section id='launcher'>
+
+			    <h1 id='launcherTitle'> PreCure </h1>
+
+                <div id="login">
+    				<input title="Username" id="loginUName"/>
+    				<input title="Password" type="password" id="loginPWord"/>
+    				<div id="loginButtons">
+    					<button onclick='loginUser()' styles="float: right;">Login</button>
+    					<button onclick='toggleRegister()'>Register</button>
+    				</div>
+    				<a onclick='toggleForgotPass()' styles='cursor:pointer; display: none'> FORGOT PASSWORD OMGOMGOMG </a>
+    			</div>
+            </section>
 		);
 	}
 });
