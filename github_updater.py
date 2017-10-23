@@ -64,7 +64,7 @@ def foo():
     return update_server(name)
 
 def mainSetup():
-    update_server()
+    update_server('DoctorDib')
     print "======================================================================="
     print "GITHUB_UPDATER - LAUNCHED"
     print "======================================================================="
