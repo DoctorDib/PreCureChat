@@ -30,7 +30,7 @@ def update_server(name):
         print "======================================================================="
         print "GITHUB_UPDATER - UPDATE SUCCESSFUL"
         print "======================================================================="
-        subprocess.Popen("node", "server.js", ">", "out.log", "&", "disown")
+        subprocess.Popen(["node", "server.js", ">", "out.log", "&", "disown"])
 
         # Returns a code
         return 'Successful'
