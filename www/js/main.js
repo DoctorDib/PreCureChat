@@ -1,10 +1,30 @@
 var socket = io();
 
-//======================================================================================================================
+//================================================================================================================
+// Page functions - Switches between pages
+//================================================================================================================
+
+forgotPassword = () => {
+    React.render(<ForgotPass />, document.getElementById('main'));
+};
+
+login = () => {
+    React.render(<Login />, document.getElementById('main'));
+};
+
+register = () => {
+    React.render(<Register />, document.getElementById('main'));
+};
+
+//================================================================================================================
+// HTML section
+//================================================================================================================
+
+//==============================================================================
 // Chatting Page
-//======================================================================================================================
-var Chat = React.createClass({
-    render: function () {
+//==============================================================================
+class Chat extends React.Component {
+    render() {
         return (
              <div id="main-container">
 				<section id='main-content'>
@@ -43,13 +63,13 @@ var Chat = React.createClass({
 			</div>
         );
     }
-});
+};
 
-//======================================================================================================================
-// Launcher page
-//======================================================================================================================
-var Launcher = React.createClass({
-	render: function(){
+//==============================================================================
+// Launcher page                                            (POSSIBLY REDUNDANT)
+//==============================================================================
+class Launcher extends React.Component {
+	render(){
 		return (
 			<section id='launcher'>
 
@@ -63,20 +83,20 @@ var Launcher = React.createClass({
 			</section>
 		);
 	}
-})
+};
 
-//======================================================================================================================
+//==============================================================================
 // Register page
-//======================================================================================================================
-var Register = React.createClass({
-	render: function(){
+//==============================================================================
+class Register extends React.Component {
+	render(){
 		return (
             <section id='launcher'>
 
 			    <h1 id='launcherTitle'> PreCure </h1>
 
                 <div id="register" class="register">
-    				<button onclick='toggleRegister()' class="btn-close">X</button>
+    				<button onClick={login} class="btn-close">X</button>
     				<div id="regError"></div>
     				<label for="regUName">Username</label>
     				<input name="Username" id="regUName"/>
@@ -93,20 +113,20 @@ var Register = React.createClass({
             </section>
 		);
 	}
-})
+};
 
-//======================================================================================================================
+//==============================================================================
 // Forgot Password page
-//======================================================================================================================
-var ForgotPassword = React.createClass({
-	render: function(){
+//==============================================================================
+class ForgotPass extends React.Component {
+	render(){
 		return (
             <section id='launcher'>
 
 			    <h1 id='launcherTitle'> PreCure </h1>
 
     			<div id="forgotPass" class="forgotPass">
-    				<button onclick='toggleForgotPass()' class="btn-close">X</button>
+    				<button onClick={login} class="btn-close">X</button>
     				<label for="regEmail">Email</label>
     				<input name="Email" id="fpEmail"/>
     				<button onclick='forgotPassword()' id="forgotPass-btn">Send email</button>
@@ -114,13 +134,13 @@ var ForgotPassword = React.createClass({
             </section>
 		);
 	}
-})
+};
 
-//======================================================================================================================
+//==============================================================================
 //Login page
-//======================================================================================================================
-var Login = React.createClass({
-	render: function(){
+//==============================================================================
+class Login extends React.Component {
+    render(){
 		return (
             <section id='launcher'>
 
@@ -131,13 +151,13 @@ var Login = React.createClass({
     				<input title="Password" type="password" id="loginPWord"/>
     				<div id="loginButtons">
     					<button onclick='loginUser()' styles="float: right;">Login</button>
-    					<button onclick='toggleRegister()'>Register</button>
+    					<button onClick={register}>Register</button>
     				</div>
-    				<a onclick='toggleForgotPass()' styles='cursor:pointer; display: none'> FORGOT PASSWORD OMGOMGOMG </a>
+    				<a onClick={forgotPassword} styles='cursor:pointer; display: none;'> FORGOT PASSWORD </a>
     			</div>
             </section>
 		);
 	}
-});
+};
 
-React.render(<Launcher />, document.getElementById('main'));
+React.render(<Login />, document.getElementById('main'));
