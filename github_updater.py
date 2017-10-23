@@ -1,9 +1,6 @@
 from flask import Flask, request
 
-import json
-import threading
-import subprocess
-import os
+import sys, json, subprocess, os
 
 from sys import executable
 
@@ -32,6 +29,8 @@ def update_server(name):
         print "======================================================================="
         subprocess.Popen(["node", "server.js", ">", "out.log", "&", "disown"])
 
+        # Allows me to print to the terminal for debugging
+        sys.stdout.flush()
         # Returns a code
         return 'Successful'
     else:
