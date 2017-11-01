@@ -37,7 +37,7 @@ sendRegister = () => {
 	let uName = jQuery('#reg-username')[0].value;
 	let dName = jQuery('#reg-displayname')[0].value;
 	let email = jQuery('#reg-email')[0].value;
-	let pass = jQuery('#login-password')[0].value;
+	let pass = jQuery('#reg-password')[0].value;
 
 	socket.emit('register_request', {'uName': uName, 'dName': dName, 'email': email, 'pass': pass})
 };
