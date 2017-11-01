@@ -1,9 +1,17 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font: 13px Helvetica, Arial; background: #000 url('../img/backgroundImg2.png') repeat bottom; background-size: 30%; }
-form { position: relative; bottom: 0; width: 100%; border: 0; background: #ccc;  padding: 10px;  display: flex; }
-form input { width: 90%; font-size: 2em; border: 0; padding: 0.2em; background-color: #dbdbdb; border-radius: 0.1em; }
-form button { width: 10%; background: #cbcbcb; font-size: 2em; border: 0; cursor: pointer; margin-left: 10px; border-radius: 0.1em; -webkit-transition: all 1s ease-out; -moz-transition: all 1s ease-out; -o-transition: all 1s ease-out; transition: all 1s ease-out; }
-form button:hover { background: #a9a9a9;  box-shadow: inset 1px 2px 4px #555; }
+body {
+    font: 13px Helvetica, Arial;
+    background: #2B2D42; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(left top, #2B2D42, #438B84); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(bottom right, #2B2D42, #438B84); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(bottom right, #2B2D42, #438B84); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to bottom right, #2B2D42, #438B84); /* Standard syntax */
+}
+#main{ background: inherit; }
+/*form { position: relative; bottom: 0; width: 100%; border: 0; background: #ccc;  padding: 10px;  display: flex; }*/
+/*form input { width: 90%; font-size: 2em; border: 0; padding: 0.2em; background-color: #dbdbdb; border-radius: 0.1em; }*/
+/*form button { width: 10%; background: #cbcbcb; font-size: 2em; border: 0; cursor: pointer; margin-left: 10px; border-radius: 0.1em; -webkit-transition: all 1s ease-out; -moz-transition: all 1s ease-out; -o-transition: all 1s ease-out; transition: all 1s ease-out; }*/
+/*form button:hover { background: #a9a9a9;  box-shadow: inset 1px 2px 4px #555; }*/
 
 #mainChat{ width: 80%; height: 97%; left: 50%; top: 50%; position: absolute; transform: translate(-50%, -50%); overflow: hidden; border-radius: 0.5em;
     -webkit-box-shadow: 10px 10px 0px rgba(0,0,0,0.4); -moz-box-shadow: 10px 10px 0px rgba(0,0,0,0.4); box-shadow: 10px 10px 0px rgba(0,0,0,0.4); }
@@ -85,61 +93,6 @@ img{ max-width: 100%; }
 .profileNames { float: left; font-size: 2em; margin-top: 5%; margin-left: 1em; }
 .online{ border: 0.3em solid #1db300; }
 
-#launcher { position: fixed; width: 100%; height: 100%; z-index: 2; display: block; background: #484 url('../img/backgroundImg.png') repeat bottom; }
-#register, #forgotPass{
-    position: absolute;
-    width: 30%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    flex-direction: column;
-    background: #222;
-    border: 5px #fff solid;
-    border-radius: 0.5em;
-    padding: 60px 20px;
-}
-.register, .forgotPass, .accountPage-close, .mainChat, .leftAccount-close{
-    display: none;
-    z-index: 0;
-}
-.register-open, .forgotPass-open, .mainChat-open, .accountPage{ display: flex; }
-#register input, #forgotPass input{ margin-top: 2px; margin-bottom: 15px; width: 100%; font-size: 3.5em; }
-#register label, #forgotPass label{ color:#fff; font-size: 1.5em; }
-#register-btn, #forgotPass-btn { display: block; border: none; width: 30%; right: 0; height: 3.5em; margin-top: 15px; cursor: pointer; }
-#login {
-    position: absolute;
-    display: flex;
-    width: 30%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    flex-direction: column;
-    background: rgba(0,0,0,0.5);
-    padding: 90px 30px 30px 30px;
-    border-radius: 0.5em;
-}
-
-.btn-close{
-    background: #444;
-    border: none;
-    cursor: pointer;
-    height: 50px;
-    width: 50px;
-    top: 0;
-    right: 0;
-    position: absolute;
-    font-size: 3em;
-    color: #fff;
-    z-index: 5;
-}
-
-#login input{ margin-top: 15px; width: 100%; font-size: 3.5em; border: none; padding: 5px; }
-#login button { display: block; border: none; width: 30%; float: left; margin-top: 60px; cursor: pointer; font-weight: bold; font-size: 2em; padding: 5px; }
-#loginButtons{ width: 100%; }
-
-#launcherInput{ font-size: 3.5em; text-align: center; border: 0; }
-#launcherButton{ text-align: center; background-color: #7f7b7b; border: 0; }
-#launcherTitle{ position:fixed; left:50%; transform: translate(-50%); font-size: 10em; color: white; }
 
 #numofPeople{
     padding: 5px 0 0 10px;

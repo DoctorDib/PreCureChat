@@ -1,4 +1,4 @@
-var socket = io();
+const socket = io();
 
 //================================================================================================================
 // Page functions - Switches between pages
@@ -93,21 +93,32 @@ class Register extends React.Component {
 		return (
             <section id='launcher'>
 
-			    <h1 id='launcherTitle'> PreCure </h1>
+			    <h1 id='launcher-title'> PreCure </h1>
+                <button id="btn-back" onClick={login} >&lt; Go Back</button>
 
-                <div id="register" class="register">
-    				<button onClick={login} class="btn-close">X</button>
+                <div id="register">
     				<div id="regError"></div>
-    				<label for="regUName">Username</label>
-    				<input name="Username" id="regUName"/>
-    				<label for="regDName">Display Name</label>
-    				<input name="DisplayName" id="regDName"/>
-    				<label for="regEmail">Email</label>
-    				<input name="Email" id="regEmail"/>
-    				<label for="regPWord">Password</label>
-    				<input name="Password" type="password" id="regPWord"/>
-    				<label for="regPWordC">Confirm Password</label>
-    				<input name="Password" type="password" id="regPWordC"/>
+
+    				<label>Username
+    				    <input name="Username" id="reg-username"/>
+                    </label>
+
+    				<label>Display Name
+    				    <input name="DisplayName" id="reg-displayname"/>
+                    </label>
+
+    				<label>Email
+    				    <input name="Email" id="reg-email"/>
+                    </label>
+
+    				<label>Password
+    				    <input name="Password" type="password" id="reg-password"/>
+                    </label>
+
+    				<label>Confirm Password
+    				    <input name="Password" type="password" id="reg-password-c"/>
+                    </label>
+
     				<button onclick='signupAcc()' id="register-btn">Register</button>
     			</div>
             </section>
@@ -123,12 +134,13 @@ class ForgotPass extends React.Component {
 		return (
             <section id='launcher'>
 
-			    <h1 id='launcherTitle'> PreCure </h1>
+			    <h1 id='launcher-title'> PreCure </h1>
+                <button id="btn-back" onClick={login} >&lt; Go Back</button>
 
-    			<div id="forgotPass" class="forgotPass">
-    				<button onClick={login} class="btn-close">X</button>
-    				<label for="regEmail">Email</label>
-    				<input name="Email" id="fpEmail"/>
+    			<div id="forgot-pass">
+    				<label>Email
+    				    <input name="Email" id="fp-email"/>
+                    </label>
     				<button onclick='forgotPassword()' id="forgotPass-btn">Send email</button>
     			</div>
             </section>
@@ -143,18 +155,21 @@ class Login extends React.Component {
     render(){
 		return (
             <section id='launcher'>
+			    <h1 id='launcher-title'> PreCure </h1>
+                <form id="login">
+                    <label>Username:
+    				    <input type="text" title="Username" id="login-username"/>
+                    </label>
 
-			    <h1 id='launcherTitle'> PreCure </h1>
+                    <label>Password:
+    				    <input title="Password" type="password" id="login-password"/>
+                    </label>
 
-                <div id="login">
-    				<input title="Username" id="loginUName"/>
-    				<input title="Password" type="password" id="loginPWord"/>
-    				<div id="loginButtons">
-    					<button onclick='loginUser()' styles="float: right;">Login</button>
-    					<button onClick={register}>Register</button>
-    				</div>
-    				<a onClick={forgotPassword} styles='cursor:pointer; display: none;'> FORGOT PASSWORD </a>
-    			</div>
+                    <button onclick='loginUser()'>Login</button>
+    				<a onClick={forgotPassword}> Forgot your password? </a>
+    			</form>
+
+                <button id="btn-register" onClick={register}>Register</button>
             </section>
 		);
 	}

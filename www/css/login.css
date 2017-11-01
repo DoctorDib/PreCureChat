@@ -1,0 +1,99 @@
+#launcher { position: fixed; width: 100%; height: 100%; z-index: 2; display: block; background: inherit; }
+#launcher-title{ position:fixed; left:50%; transform: translate(-50%); font-size: 10em; color: white; }
+
+#login {
+    position: absolute;
+    display: flex;
+    width: 30%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+    padding: 90px 30px 30px 30px;
+    border-radius: 0.5em;
+}
+
+#login label{ color: rgba(200, 200, 200, 0.6); font-size: 1.4em; margin-top: 15px; }
+#login input{ width: 100%; font-size: 2em; border: none; padding: 5px 5px 10px; margin-top: 5px; background: transparent; border-bottom: 2px rgba(200, 200, 200, 0.6) solid; color: #fff;
+            -webkit-transition: .3s ease-out;
+            -moz-transition: .3s ease-out;
+            -o-transition: .3s ease-out;
+            transition: .3s ease-out;
+}
+#login input:focus { outline: none; border-bottom: 2px rgba(200, 200, 200, 1) solid; }
+#login input:hover { border-bottom: 2px rgba(200, 200, 200, 1) solid; }
+#login button { width: 100%; border: none; margin-top: 20px; font-size: 2em; background: rgba(255, 255, 255, 1); padding: 5px; cursor: pointer; box-shadow: 0 0 #000;
+                -webkit-transition: .3s ease-out;
+                -moz-transition: .3s ease-out;
+                -o-transition: .3s ease-out;
+                transition: .3s ease-out;
+}
+#login button:focus { outline: none; }
+#login button:hover { box-shadow: 0 3px rgba(0,0,0,0.4); background: rgba(255, 255, 255, 0.7); }
+#login a {cursor: pointer; color: rgba(200, 200, 200, 0.6); margin-top: 5px; }
+
+#btn-register {right: 0; background: transparent; color: #fff; font-size: 2em; cursor: pointer; padding: 10px; margin: 5px; border:2px rgba( 255, 255, 255, 0.8) solid;  position: absolute; border-radius: 0.2em; }
+#btn-register:focus { outline:none; }
+
+/* REGISTER COMPONENT */
+#register {
+    position: absolute;
+    display: flex;
+    width: 30%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+    padding: 90px 30px 30px 30px;
+    border-radius: 0.5em;
+}
+
+#btn-back { right: 0; background: transparent; color: #fff; font-size: 2em; cursor: pointer; padding: 10px; margin: 5px; border:2px rgba( 255, 255, 255, 0.8) solid;  position: absolute; border-radius: 0.2em; }
+#register label{ color: rgba(200, 200, 200, 0.6); font-size: 1.4em; margin-top: 15px; }
+#register input{ width: 100%; font-size: 2em; border: none; padding: 5px 5px 10px; margin-top: 5px; background: transparent; border-bottom: 2px rgba(200, 200, 200, 0.6) solid; color: #fff;
+    -webkit-transition: .3s ease-out;
+    -moz-transition: .3s ease-out;
+    -o-transition: .3s ease-out;
+    transition: .3s ease-out;
+}
+#register input:focus { outline: none; border-bottom: 2px rgba(200, 200, 200, 1) solid; }
+#register input:hover { border-bottom: 2px rgba(200, 200, 200, 1) solid; }
+#register button { width: 100%; border: none; margin-top: 20px; font-size: 2em; background: rgba(255, 255, 255, 1); padding: 5px; cursor: pointer; box-shadow: 0 0 #000;
+    -webkit-transition: .3s ease-out;
+    -moz-transition: .3s ease-out;
+    -o-transition: .3s ease-out;
+    transition: .3s ease-out;
+}
+#register button:focus { outline: none; }
+#register button:hover { box-shadow: 0 3px rgba(0,0,0,0.4); background: rgba(255, 255, 255, 0.7); }
+
+/* FORGOT PASSWORD COMPONENT */
+#forgot-pass {
+    position: absolute;
+    display: flex;
+    width: 30%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+    padding: 90px 30px 30px 30px;
+    border-radius: 0.5em;
+}
+
+#forgot-pass label{ color: rgba(200, 200, 200, 0.6); font-size: 1.4em; margin-top: 15px; }
+#forgot-pass input{ width: 100%; font-size: 2em; border: none; padding: 5px 5px 10px; margin-top: 5px; background: transparent; border-bottom: 2px rgba(200, 200, 200, 0.6) solid; color: #fff;
+    -webkit-transition: .3s ease-out;
+    -moz-transition: .3s ease-out;
+    -o-transition: .3s ease-out;
+    transition: .3s ease-out;
+}
+#forgot-pass input:focus { outline: none; border-bottom: 2px rgba(200, 200, 200, 1) solid; }
+#forgot-pass input:hover { border-bottom: 2px rgba(200, 200, 200, 1) solid; }
+#forgot-pass button { width: 100%; border: none; margin-top: 20px; font-size: 2em; background: rgba(255, 255, 255, 1); padding: 5px; cursor: pointer; box-shadow: 0 0 #000;
+    -webkit-transition: .3s ease-out;
+    -moz-transition: .3s ease-out;
+    -o-transition: .3s ease-out;
+    transition: .3s ease-out;
+}
+#forgot-pass button:focus { outline: none; }
+#forgot-pass button:hover { box-shadow: 0 3px rgba(0,0,0,0.4); background: rgba(255, 255, 255, 0.7); }
