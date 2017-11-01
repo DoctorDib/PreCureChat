@@ -1,10 +1,10 @@
 const sha256 = require('js-sha256');
-
-var express = require('express'),
+const express = require('express'),
     app = express(),
     path = require('path'),
     http = require('http').Server(app),
-    io = require('socket.io')(http)
+    io = require('socket.io')(http);
+const MongoClient = require('mongodb').MongoClient;
 
 app.use(express.static(path.join(__dirname, './www')));
 
@@ -19,8 +19,6 @@ function generateToken(uName, dName){
 //==============================================================================
 // MONGODB SETUP - Setting up MongoDB
 //==============================================================================
-
-var MongoClient = require('mongodb').MongoClient;
 
 MongoClient.connect("mongodb://localhost:27017/precureMaster", function(err, database) {
 
