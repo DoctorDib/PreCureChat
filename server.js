@@ -52,7 +52,7 @@ io.on('connection', function (socket) {
         const email = user.email;
         let pass = user.pass;
         // Hashing it out.
-        pass += sha256(sha256(uName));
+        pass += sha256(uName);
         pass = sha256(pass);
 
         if(checkAccount({"username": uName})){
@@ -78,7 +78,7 @@ io.on('connection', function (socket) {
         const uName = user.uName;
         let pass = user.pass;
         // Hashing it out.
-        pass += sha256(sha256(uName));
+        pass += sha256(uName);
         pass = sha256(pass);
 
         if(checkAccount({"username": uName, "password": pass})){
