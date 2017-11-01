@@ -59,12 +59,14 @@ MongoClient.connect("mongodb://localhost:27017/precureMaster", function(err, dat
 
 //==============================================================================
 
-let checkValid = function(data){
-    db.collection("user_collection").find(data).toArray(
+async function checkValid(data){
+    let res;
+    await db.collection("user_collection").find(data).toArray(
         function(err, results) {
-            return results.length;
+            res = results.length === 1;
         }
     );
+    return res;
 };
 
 io.on('connection', function (socket) {
