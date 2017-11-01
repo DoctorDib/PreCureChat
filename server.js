@@ -83,10 +83,9 @@ io.on('connection', function (socket) {
         pass += sha256(uName);
         pass = sha256(pass);
 
-        if(checkValid({"username": uName})){
         let token_set = generateToken(uName, dName);
 
-        if(checkAccount({"username": uName})){
+        if(checkValid({"username": uName})){
             socket.emit('register_response', {'result':'fail', 'reason': 'Account already exists!'});
         } else {
             // Creating new user field.
