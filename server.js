@@ -33,7 +33,7 @@ MongoClient.connect("mongodb://localhost:27017/precureMaster", function(err, dat
 //==============================================================================
 
 let checkAccount = function(data){
-    db.user_collection.find(data).toArray(
+    db.collection("user_collection").find(data).toArray(
         function(err, results) {
             return results.length;
         }
@@ -60,7 +60,7 @@ io.on('connection', function (socket) {
             socket.emit('register_response', {'result':'fail', 'reason': 'Account already exists!'});
         } else {
             // Creating new user field.
-            db.user_collection.insert({
+            db.collection("user_collection").insert({
                 "username": uName,
                 "display_name": dName,
                 "email": email,
