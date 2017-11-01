@@ -12,8 +12,36 @@ app.use(express.static(path.join(__dirname, './www')));
 
 function generateToken(uName, dName){
     return {
-        token: sha256(dName+uName+(Math.floor((Math.random() * 1000000) + 1)).toString())
+        token: sha256(dName+uName+(Math.floor((Math.random() * 1000000) + 1)).toString()),
+        expiry: getDateTime(7)
     };
+}
+
+function getDateTime(increase) {
+
+    var date = new Date();
+
+    date.setDate(date.getDate() + increase);
+
+    var hour = date.getHours();
+    hour = (hour < 10 ? "0" : "") + hour;
+
+    var min  = date.getMinutes();
+    min = (min < 10 ? "0" : "") + min;
+
+    var sec  = date.getSeconds();
+    sec = (sec < 10 ? "0" : "") + sec;
+
+    var year = date.getFullYear();
+
+    var month = date.getMonth() + 1;
+    month = (month < 10 ? "0" : "") + month;
+
+    var day  = date.getDate();
+    day = (day < 10 ? "0" : "") + day;
+
+    return year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + sec;
+
 }
 
 //==============================================================================
@@ -55,6 +83,8 @@ io.on('connection', function (socket) {
         pass += sha256(uName);
         pass = sha256(pass);
 
+        let token_set = generateToken(uName, dName);
+
         if(checkAccount({"username": uName})){
             socket.emit('register_response', {'result':'fail', 'reason': 'Account already exists!'});
         } else {
@@ -68,7 +98,8 @@ io.on('connection', function (socket) {
                 "servers": [],
                 "user_status": 0,
                 "create_date": new Date(),
-                "token": generateToken(uName, dName)
+                "token": token_set.token,
+                "token_expiry": token_set.expiry
             });
             socket.emit('register_response', {'result':'success'});
         }
