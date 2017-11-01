@@ -1,5 +1,21 @@
 const socket = io();
 
+socket.on('login_response', function(response){
+	if(response.result === 'success'){
+		React.render(<Chat />, document.getElementById('main'));
+	} else {
+		console.log(response.reason);
+	}
+});
+
+socket.on('register_response', function(response){
+	if(response.result === 'success'){
+		React.render(<Login />, document.getElementById('main'));
+	} else {
+		console.log(response.reason);
+	}
+});
+
 //================================================================================================================
 // Page functions - Switches between pages
 //================================================================================================================
@@ -14,6 +30,23 @@ login = () => {
 
 register = () => {
     React.render(<Register />, document.getElementById('main'));
+};
+
+
+sendRegister = () => {
+	let uName = jQuery('#reg-username')[0].value;
+	let dName = jQuery('#reg-displayname')[0].value;
+	let email = jQuery('#reg-email')[0].value;
+	let pass = jQuery('#login-password')[0].value;
+
+	socket.emit('register_request', {'uName': uName, 'dName': dName, 'email': email, 'pass': pass})
+};
+
+sendLogin = () => {
+	let uName = jQuery('#login-username')[0].value;
+	let pass = jQuery('#login-password')[0].value;
+
+	socket.emit('login_request', {'uName': uName, 'pass': pass})
 };
 
 //================================================================================================================
@@ -119,7 +152,7 @@ class Register extends React.Component {
     				    <input name="Password" type="password" id="reg-password-c"/>
                     </label>
 
-    				<button onclick='signupAcc()' id="register-btn">Register</button>
+    				<button onClick={sendRegister} id="register-btn">Register</button>
     			</div>
             </section>
 		);
@@ -141,7 +174,7 @@ class ForgotPass extends React.Component {
     				<label>Email
     				    <input name="Email" id="fp-email"/>
                     </label>
-    				<button onclick='forgotPassword()' id="forgotPass-btn">Send email</button>
+    				<button onClick={forgotPassword} id="forgotPass-btn">Send email</button>
     			</div>
             </section>
 		);
@@ -165,7 +198,7 @@ class Login extends React.Component {
     				    <input title="Password" type="password" id="login-password"/>
                     </label>
 
-                    <button onclick='loginUser()'>Login</button>
+                    <button onClick={sendLogin}>Login</button>
     				<a onClick={forgotPassword}> Forgot your password? </a>
     			</form>
 
