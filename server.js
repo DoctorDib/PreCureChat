@@ -5,6 +5,7 @@ const express = require('express'),
     http = require('http').Server(app),
     io = require('socket.io')(http);
 const MongoClient = require('mongodb').MongoClient;
+let db;
 
 app.use(express.static(path.join(__dirname, './www')));
 
@@ -24,7 +25,7 @@ MongoClient.connect("mongodb://localhost:27017/precureMaster", function(err, dat
 
     if(err) return console.error(err);
 
-    global.db = database;
+    db = database;
     console.log("connected to " + db.s.databaseName);
 
 });
