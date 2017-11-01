@@ -31,7 +31,7 @@ MongoClient.connect("mongodb://localhost:27017/precureMaster", function(err, dat
 
 //==============================================================================
 
-let checkAccount = function(data){
+let checkValid = function(data){
     db.collection("user_collection").find(data).toArray(
         function(err, results) {
             return results.length;
@@ -55,7 +55,7 @@ io.on('connection', function (socket) {
         pass += sha256(uName);
         pass = sha256(pass);
 
-        if(checkAccount({"username": uName})){
+        if(checkValid({"username": uName})){
             socket.emit('register_response', {'result':'fail', 'reason': 'Account already exists!'});
         } else {
             // Creating new user field.
@@ -81,7 +81,7 @@ io.on('connection', function (socket) {
         pass += sha256(uName);
         pass = sha256(pass);
 
-        if(checkAccount({"username": uName, "password": pass})){
+        if(checkValid({"username": uName, "password": pass})){
             socket.emit('login_response', {'result':'success'});
         } else {
             socket.emit('login_response', {'result':'fail', 'reason': 'Account not found!'});
@@ -89,7 +89,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('token_login', function(token){
-        if(checkAccount({"token": token})){
+        if(checkValid({"token": token})){
             socket.emit('login_response', {'result':'success', 'token': token});
         } else {
             socket.emit('login_response', {'result':'fail', 'reason': 'Token not found!'});
