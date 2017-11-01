@@ -12,8 +12,7 @@ app.use(express.static(path.join(__dirname, './www')));
 
 function generateToken(uName, dName){
     return {
-        token: sha256(dName+uName+(Math.floor((Math.random() * 1000000) + 1)).toString()),
-        expiry: getDateTime(7)
+        token: sha256(dName+uName+(Math.floor((Math.random() * 1000000) + 1)).toString())
     };
 }
 
