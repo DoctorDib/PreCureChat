@@ -1,12 +1,4 @@
-const socket = io();
-
-socket.on('login_response', function(response){
-	if(response.result === 'success'){
-		React.render(<Chat />, document.getElementById('main'));
-	} else {
-		console.log(response.reason);
-	}
-});
+var socket = io();
 
 socket.on('register_response', function(response){
 	if(response.result === 'success'){
@@ -42,11 +34,25 @@ sendRegister = () => {
 	socket.emit('register_request', {'uName': uName, 'dName': dName, 'email': email, 'pass': pass})
 };
 
-sendLogin = () => {
+var test = function(){
+    React.render(<Main />, document.getElementById('main'));
+}
+
+socket.on('login_response', function(response){
+	
+    if(response.result === 'success'){
+        React.render(<Main />, document.getElementById('main'));
+    } else {
+    	console.log(response.reason);
+    }
+});
+
+sendLoginDetails = () => {
 	let uName = jQuery('#login-username')[0].value;
 	let pass = jQuery('#login-password')[0].value;
 
 	socket.emit('login_request', {'uName': uName, 'pass': pass})
+	
 };
 
 //================================================================================================================
@@ -56,15 +62,15 @@ sendLogin = () => {
 //==============================================================================
 // Chatting Page
 //==============================================================================
-class Chat extends React.Component {
+class Main extends React.Component {
     render() {
         return (
              <div id="main-container">
 				<section id='main-content'>
-					<ul id="messages" class="custom-scroll"></ul>
+					<ul id="messages" className="custom-scroll"></ul>
 					<form action="" id="messageInput">
-						<p class="typing"> </p>
-						<input id="m" autocomplete="off" autofocus/>
+						<p className="typing"> </p>
+						<input id="m" autoComplete="off" autofocus/>
 						<button id="desktop-send">Send</button>
 						<button id="mobile-send"></button>
 					</form>
@@ -72,8 +78,8 @@ class Chat extends React.Component {
 
 				<section id="right-menu">
 					<section id="menu-control">
-						<button onclick='connectToRoom("test")'>Join Test</button>
-						<button onclick='connectToRoom("testicles")'>Join Testicles</button>
+						<button >Join Test</button>
+						<button >Join Testicles</button>
 					</section>
 
 					<section id="server-online">
@@ -189,7 +195,7 @@ class Login extends React.Component {
 		return (
             <section id='launcher'>
 			    <h1 id='launcher-title'> PreCure </h1>
-                <form id="login">
+                <div id="login">
                     <label>Username:
     				    <input type="text" title="Username" id="login-username"/>
                     </label>
@@ -198,9 +204,9 @@ class Login extends React.Component {
     				    <input title="Password" type="password" id="login-password"/>
                     </label>
 
-                    <button onClick={sendLogin}>Login</button>
+                    <button onClick={sendLoginDetails}>Login</button>
     				<a onClick={forgotPassword}> Forgot your password? </a>
-    			</form>
+    			</div>
 
                 <button id="btn-register" onClick={register}>Register</button>
             </section>

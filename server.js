@@ -1,5 +1,5 @@
 const sha256 = require('js-sha256');
-const express = require('express'),
+var express = require('express'),
     app = express(),
     path = require('path'),
     http = require('http').Server(app),
