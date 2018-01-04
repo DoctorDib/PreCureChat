@@ -94,20 +94,22 @@
                             <% _.forEach(val, function(group){ %>
                             <form action="#" method="post" id="add-fav">
                                 <div class="item col-md-4">
-                                    <div class="thumbnail">
-                                        <img src="uploads/group-images/<%= group.id; %>/<%= group.image; %>" style="width: 75%;">
-                                        <div class="caption">
-                                            <h4>Name</h4>
-                                            <%= group.name; %>
-                                            <div class="row">
-                                                <div class="col-xs-12 col-md-6">
-                                                    <button class="btn add-fav">
-                                                        Add To Favorite
-                                                    </button>
+                                    <a href="/group/<%=group.id%>">
+                                        <div class="thumbnail">
+                                            <img src="uploads/group-images/<%= group.id; %>/<%= group.image; %>" style="width: 75%;">
+                                            <div class="caption">
+                                                <h4>Name</h4>
+                                                <%= group.name; %>
+                                                <div class="row">
+                                                    <div class="col-xs-12 col-md-6">
+                                                        <button class="btn add-fav">
+                                                            Add To Favorite
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </a>
                                 </div>
                             </form>
                             <% }) %>

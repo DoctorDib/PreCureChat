@@ -21,8 +21,8 @@ dependencies.resolve(function(user, _, admin, home){
     function SetupExpress(){
         const app = express();
         const server = http.createServer(app);
-        server.listen(3000, function(){
-            console.log('Listening on port 3000');
+        server.listen(8080, function(){
+            console.log('Listening on port 8080');
         });
 
         configureExpress(app);
