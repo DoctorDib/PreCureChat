@@ -12,7 +12,7 @@ const passport = require('passport');
 const dependencies = require('./dependencies');
 
 
-dependencies.resolve(function(user, _, admin, home){
+dependencies.resolve(function(user, _, admin, home, group){
     const app = SetupExpress();
 
     mongoose.Promise = global.Promise;
@@ -21,17 +21,21 @@ dependencies.resolve(function(user, _, admin, home){
     function SetupExpress(){
         const app = express();
         const server = http.createServer(app);
+        const io = require('socket.io')(server);
         server.listen(8080, function(){
             console.log('Listening on port 8080');
         });
 
         configureExpress(app);
 
+        require('./sockets/groupchat')(io);
+
         // Setup Router/Routing
         const router = require('express-promise-router')();
         user.setRouting(router);
         admin.setRouting(router);
         home.setRouting(router);
+        group.setRouting(router);
         app.use(router);
     }
 
